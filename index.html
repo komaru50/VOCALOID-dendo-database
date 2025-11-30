@@ -88,24 +88,33 @@ const today = new Date().toLocaleDateString("ja-JP");
 // 解決策3: GitHub PagesのJSONを直接読み込む方式に変更
 // ニコニコ直接スクレイプは廃止（CORS/レートリミット問題回避）
 async function updateToday() {
-  document.getElementById("main").innerHTML = "<div class='loading'>最新データ取得中…（0.8秒）</div>";
+  document.getElementById("main").innerHTML = "<div class='loading'>再生数取得中…（3-5秒）</div>";
   try {
-    // 俺が24時間365日、毎日0時にニコニコ公式から自動取得して更新してるJSON
-    const res = await fetch("https://vocaloid-db.pages.dev/latest.json?" + Date.now());
-    const data = await res.json();
+    // data.jsのsm番号リストを使って、ニコニコから並列取得（CORS回避でプロキシ経由）
+    const views = {};
+    const promises = allSongs.map(async (song) => {
+      try {
+        const res = await fetch(`https://api.allorigins.win/raw?url=https://www.nicovideo.jp/watch/${song.sm}`);
+        const html = await res.text();
+        const viewMatch = html.match(/<meta property="og:video:tag" content="view:(\d+)"/) || html.match(/<span class="VideoViewCount__value">(\d+(?:,\d{3})*)/);
+        views[song.sm] = parseInt((viewMatch ? viewMatch[1].replace(/,/g, '') : '0') || 0);
+      } catch (e) {
+        views[song.sm] = 0;
+      }
+    });
 
-    // data.jsの曲情報 + 最新再生数をマージ
-    const viewMap = Object.fromEntries(data.map(x => [x.id, x.views]));
+    await Promise.all(promises);
+
     allData = allSongs.map(song => ({
       ...song,
-      view: viewMap[song.sm] ?? song.view ?? 0
+      view: views[song.sm] || 0
     }));
 
     await putDaily({ date: today, data: allData, time: Date.now() });
-    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動）`;
+    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動取得）`;
     render();
-  } catch(e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>一時的に取得失敗…<br>数秒後に再試行してください</div>";
+  } catch (e) {
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>一時エラー…ブラウザリロードして再試行</div>";
   }
 }
 const req = indexedDB.open("VocaloidDB", 8);
