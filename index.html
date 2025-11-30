@@ -23,14 +23,11 @@ tr:hover{background:#f0fbff;}
 body.dark tr:hover{background:#2a2a2a;}
 a{color:#00bfff;text-decoration:none;font-weight:600;}
 .tag{display:inline-block;background:#00bfff;color:white;padding:.3rem .8rem;border-radius:30px;margin:0.2rem;font-size:0.85rem;cursor:pointer;}
-.update-btn{position:absolute;top:20px;right:20px;background:#ff4444;color:white;border:none;padding:.8rem 1.5rem;border-radius:50px;cursor:pointer;}
+.update-btn{position:absolute;top:20px;right:20px;background:#ff4444;color:white;border:none;padding:.8rem 1.5rem;border-radius:50px;cursor:pointer;font-size:0.9rem;}
 .last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,.9);font-size:0.9rem;}
-#darkmode{position:absolute;top:20px;left:20px;background:#333;color:white;padding:.8rem;border-radius:50%;cursor:pointer;}
+#darkmode{position:absolute;top:20px;left:20px;background:#333;color:white;padding:.8rem 1.2rem;border-radius:50%;cursor:pointer;font-size:0.9rem;}
 .fav{cursor:pointer;font-size:1.4rem;margin-right:.5rem;}
 .fav.on{color:#ff4444;}
-.diff{font-weight:bold;margin-left:.5rem;}
-.diff.up{color:#080;}
-.diff.down{color:#d00;}
 .loading{text-align:center;padding:4rem;font-size:1.4rem;color:#0066aa;}
 .pagination{text-align:center;margin:2rem 0;}
 .pagination button{padding:.7rem 1.3rem;margin:0 .2rem;border:none;border-radius:8px;background:#00bfff;color:white;cursor:pointer;}
@@ -57,13 +54,12 @@ body.dark #hitokoto-section{background:#1e1e1e;}
 <nav>
   <a href="#home" class="active">ランキング</a>
   <a href="#list">全曲一覧</a>
-  <a href="#p">P別</a>
   <a href="#fav">お気に入り</a>
   <a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
-  <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
+  <input type="text" id="search" placeholder="曲名・投稿者で検索">
 </div>
 
 <div class="container" id="main"></div>
@@ -79,62 +75,48 @@ body.dark #hitokoto-section{background:#1e1e1e;}
   <div id="hitokoto-list"></div>
 </div>
 
-<script src="data.js"></script>
 <script>
 const PAGE_SIZE = 30;
 let allData = [], db = null, currentPage = 1;
-const today = new Date().toLocaleDateString("ja-JP");
+const today = new Date().toISOString().slice(0,10);
 
-// 解決策3: GitHub PagesのJSONを直接読み込む方式に変更
-// ニコニコ直接スクレイプは廃止（CORS/レートリミット問題回避）
+// ここだけ変更！自分のGitHubリポジトリに置いたJSONを指定
+const MASTER_JSON_URL = 'https://raw.githubusercontent.com/komaru50/VOCALOID-dendo-database/main/vocaloid_hall.json';
+// 例: https://raw.githubusercontent.com/ryohey-v/vocaloid-dendou/main/data.json
+
+async function loadMasterData() {
+  const res = await fetch(MASTER_JSON_URL);
+  return await res.json(); // [{sm: "sm1234567", title: "...", uploader: "..."}, ...]
+}
+
 async function updateToday() {
-  document.getElementById("main").innerHTML = "<div class='loading'>再生数取得中…（3-5秒）</div>";
+  document.getElementById("main").innerHTML = "<div class='loading'>再生数取得中…（数秒〜数十秒かかります）</div>";
   try {
-    // ニコニコ公開APIでsm番号から再生数取得（CORS回避でJSONP風）
-    const viewPromises = allSongs.map(async (song) => {
+    const master = await loadMasterData();
+    const promises = master.map(async song => {
       try {
         const res = await fetch(`https://api.allorigins.win/get?url=https://ext.nicovideo.jp/api/getthumbinfo/${song.sm}`);
-        const apiData = await res.json();
-        const xml = new DOMParser().parseFromString(apiData.contents, "text/xml");
-        const viewCount = xml.querySelector('view_counter')?.textContent || '0';
-        return { sm: song.sm, view: parseInt(viewCount) };
-      } catch (e) {
-        return { sm: song.sm, view: 0 };
+        const data = await res.json();
+        const xml = new DOMParser().parseFromString(data.contents, "text/xml");
+        const view = parseInt(xml.querySelector('view_counter')?.textContent || '0');
+        return { ...song, view };
+      } catch(e) {
+        return { ...song, view: 0 };
       }
     });
 
-    const views = await Promise.all(viewPromises);
-    const viewMap = Object.fromEntries(views.map(v => [v.sm, v.view]));
-
-    allData = allSongs.map(song => ({
-      ...song,
-      view: viewMap[song.sm] || 0
-    }));
-
+    allData = await Promise.all(promises);
     await putDaily({ date: today, data: allData, time: Date.now() });
     document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動取得）`;
     render();
-  } catch (e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>エラー発生…ブラウザリロードして再試行</div>";
+  } catch(e) {
     console.error(e);
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>取得エラー…リロードして再試行してください</div>";
   }
 }
 
-    await Promise.all(promises);
-
-    allData = allSongs.map(song => ({
-      ...song,
-      view: views[song.sm] || 0
-    }));
-
-    await putDaily({ date: today, data: allData, time: Date.now() });
-    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動取得）`;
-    render();
-  } catch (e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>一時エラー…ブラウザリロードして再試行</div>";
-  }
-}
-const req = indexedDB.open("VocaloidDB", 8);
+// IndexedDB
+const req = indexedDB.open("VocaloidDB", 9);
 req.onupgradeneeded = e => {
   db = e.target.result;
   if (!db.objectStoreNames.contains("daily")) db.createObjectStore("daily", {keyPath: "date"});
@@ -145,11 +127,10 @@ req.onsuccess = e => { db = e.target.result; init(); };
 
 async function init() {
   const cached = await getDaily(today);
-  if (cached) {
+  if (cached && cached.data.length > 0) {
     allData = cached.data;
     document.getElementById("last-update").textContent = `最終更新：${new Date(cached.time).toLocaleString("ja-JP")}`;
   } else {
-    // 初回は自動で更新実行（解決策3の自動化対応）
     await updateToday();
   }
   render();
@@ -157,8 +138,21 @@ async function init() {
   document.getElementById("darkmode").onclick = () => document.body.classList.toggle("dark");
 }
 
-async function getDaily(d) { return new Promise(r => db.transaction("daily").objectStore("daily").get(d).onsuccess = e => r(e.target.result)); }
-async function putDaily(o) { return new Promise(r => db.transaction("daily","readwrite").objectStore("daily").put(o).onsuccess = r); }
+async function getDaily(d) { 
+  return new Promise(r => db.transaction("daily").objectStore("daily").get(d).onsuccess = e => r(e.target.result)); 
+}
+async function putDaily(o) { 
+  return new Promise(r => db.transaction("daily","readwrite").objectStore("daily").put(o).onsuccess = r); 
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  let html = '';
+  for (let i = 1; i <= pages; i++) {
+    html += `<button ${i===currentPage?'class="active"':''} onclick="currentPage=${i};render()">${i}</button>`;
+  }
+  document.getElementById("pagination").innerHTML = html;
+}
 
 function render() {
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
@@ -167,14 +161,16 @@ function render() {
 
   let filtered = allData.filter(v => {
     const q = document.getElementById("search").value.toLowerCase();
-    return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || v.tags.some(t=>t.toLowerCase().includes(q));
+    return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q);
   });
 
+  // お気に入りフィルタ
   if (hash === "fav") {
-    const favs = [...localStorage].filter(k => k[0].startsWith("fav_")).map(k => k[0].slice(4));
+    const favs = Object.keys(localStorage).filter(k => k.startsWith("fav_")).map(k => k.slice(4));
     filtered = filtered.filter(v => favs.includes(v.sm));
   }
 
+  // 掲示板
   if (hash === "hitokoto") {
     document.getElementById("main").innerHTML = "";
     document.getElementById("pagination").innerHTML = "";
@@ -184,41 +180,36 @@ function render() {
     document.getElementById("hitokoto-section").style.display = "none";
   }
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  currentPage = Math.min(currentPage, totalPages || 1);
-  const pageData = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
-
-  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filtered.length} 曲中 ${(currentPage-1)*PAGE_SIZE+1}〜${Math.min(currentPage*PAGE_SIZE, filtered.length)} 件</div>`;
-
-  if (hash === "list" || hash === "fav") {
-    // 一覧表示（省略）
-  } else if (hash === "p") {
-    // P別（省略）
-  } else {
+  // ランキングソート
+  if (hash === "home") {
     filtered.sort((a,b) => b.view - a.view);
-    const ranked = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
-    html += "<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
-    ranked.forEach((v,i) => {
-      const rank = filtered.indexOf(v) + 1;
-      const isFav = localStorage.getItem("fav_"+v.sm);
-      html += `<tr>
-        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
-        <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
-            <a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td>
-        <td>${v.uploader}</td>
-        <td style="text-align:right;">${v.view.toLocaleString()}</td>
-      </tr>`;
-    });
-    html += "</tbody></table>";
   }
 
+  const start = (currentPage-1) * PAGE_SIZE;
+  const pageData = filtered.slice(start, start + PAGE_SIZE);
+
+  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filtered.length} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, filtered.length)} 件</div>`;
+  html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>`;
+  pageData.forEach((v, i) => {
+    const rank = filtered.indexOf(v) + 1;
+    const isFav = localStorage.getItem("fav_"+v.sm);
+    html += `<tr>
+      <td style="text-align:center;font-weight:bold;color:#00bfff;">${hash==="home"?rank:(start+i+1)}</td>
+      <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+          <a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td>
+      <td>${v.uploader}</td>
+      <td style="text-align:right;">${v.view.toLocaleString()}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
   document.getElementById("main").innerHTML = html;
-  // pagination省略（必要なら言ってください）
+  renderPagination(filtered.length);
 }
 
 function toggleFav(sm) {
-  if (localStorage.getItem("fav_"+sm)) localStorage.removeItem("fav_"+sm);
-  else localStorage.setItem("fav_"+sm, "1");
+  const key = "fav_" + sm;
+  if (localStorage.getItem(key)) localStorage.removeItem(key);
+  else localStorage.setItem(key, "1");
   render();
 }
 
@@ -226,9 +217,9 @@ function loadHitokoto() {
   const tx = db.transaction("hitokoto");
   tx.objectStore("hitokoto").getAll().onsuccess = e => {
     const posts = e.target.result.reverse();
-    document.getElementById("hitokoto-list").innerHTML = posts.length ? posts.map(p => `
+    document.getElementById("hitokoto-list").innerHTML = posts.length ? posts.map((p,i) => `
       <div class="hitokoto-item">
-        <span class="hitokoto-no">${posts.indexOf(p)+1}</span>
+        <span class="hitokoto-no">${i+1}</span>
         <span class="hitokoto-name">${p.name||"名無し"}</span>
         <span class="hitokoto-comment">${p.comment}</span>
         <span class="hitokoto-date">${p.date}</span>
