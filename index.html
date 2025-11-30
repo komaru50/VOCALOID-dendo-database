@@ -90,18 +90,35 @@ const today = new Date().toLocaleDateString("ja-JP");
 async function updateToday() {
   document.getElementById("main").innerHTML = "<div class='loading'>再生数取得中…（3-5秒）</div>";
   try {
-    // data.jsのsm番号リストを使って、ニコニコから並列取得（CORS回避でプロキシ経由）
-    const views = {};
-    const promises = allSongs.map(async (song) => {
+    // ニコニコ公開APIでsm番号から再生数取得（CORS回避でJSONP風）
+    const viewPromises = allSongs.map(async (song) => {
       try {
-        const res = await fetch(`https://api.allorigins.win/raw?url=https://www.nicovideo.jp/watch/${song.sm}`);
-        const html = await res.text();
-        const viewMatch = html.match(/<meta property="og:video:tag" content="view:(\d+)"/) || html.match(/<span class="VideoViewCount__value">(\d+(?:,\d{3})*)/);
-        views[song.sm] = parseInt((viewMatch ? viewMatch[1].replace(/,/g, '') : '0') || 0);
+        const res = await fetch(`https://api.allorigins.win/get?url=https://ext.nicovideo.jp/api/getthumbinfo/${song.sm}`);
+        const apiData = await res.json();
+        const xml = new DOMParser().parseFromString(apiData.contents, "text/xml");
+        const viewCount = xml.querySelector('view_counter')?.textContent || '0';
+        return { sm: song.sm, view: parseInt(viewCount) };
       } catch (e) {
-        views[song.sm] = 0;
+        return { sm: song.sm, view: 0 };
       }
     });
+
+    const views = await Promise.all(viewPromises);
+    const viewMap = Object.fromEntries(views.map(v => [v.sm, v.view]));
+
+    allData = allSongs.map(song => ({
+      ...song,
+      view: viewMap[song.sm] || 0
+    }));
+
+    await putDaily({ date: today, data: allData, time: Date.now() });
+    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動取得）`;
+    render();
+  } catch (e) {
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>エラー発生…ブラウザリロードして再試行</div>";
+    console.error(e);
+  }
+}
 
     await Promise.all(promises);
 
