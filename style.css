@@ -1,0 +1,269 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #f0f8ff;
+  margin: 0;
+  color: #222;
+}
+
+header {
+  background: #00bfff;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+nav {
+  background: #008fd5;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav a {
+  color: white;
+  margin: 0 1.2rem;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+nav a:hover, nav a.active {
+  background: #0066aa;
+}
+
+.container {
+  max-width: 1300px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,191,255,0.3);
+}
+
+th {
+  background: #00bfff;
+  color: white;
+  padding: 1.2rem;
+  text-align: left;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background: #f0fbff;
+}
+
+a {
+  color: #00bfff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.tag {
+  display: inline-block;
+  background: #00bfff;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  margin: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.tag:hover {
+  background: #0099cc;
+}
+
+.search-box {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.search-box input {
+  padding: 1rem 1.5rem;
+  font-size: 1.2rem;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 50px;
+  border: 3px solid #00bfff;
+  outline: none;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,191,255,0.2);
+}
+
+.highlight {
+  background: #ffff99;
+  font-weight: bold;
+}
+
+.loading {
+  text-align: center;
+  color: #0066aa;
+  font-size: 1.2rem;
+  margin: 3rem;
+  font-weight: bold;
+}
+
+.update-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.update-btn:hover {
+  background: #ff5252;
+}
+
+.update-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.last-update {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9rem;
+}
+
+#hitokoto-section {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0,191,255,0.3);
+  display: none;
+}
+
+#hitokoto-form {
+  background: #f8f8f8;
+  border: 2px dashed #00bfff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+#hitokoto-name {
+  padding: 0.8rem;
+  width: 200px;
+  border-radius: 8px;
+  border: 1px solid #00bfff;
+  margin: 0 0.5rem;
+}
+
+#hitokoto-comment {
+  padding: 0.8rem;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 8px;
+  border: 1px solid #00bfff;
+  margin: 0 0.5rem;
+}
+
+#hitokoto-submit {
+  padding: 0.8rem 2rem;
+  background: #00bfff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#hitokoto-submit:hover {
+  background: #0099cc;
+}
+
+.hitokoto-list {
+  border-top: 3px solid #00bfff;
+  padding-top: 1rem;
+}
+
+.hitokoto-item {
+  padding: 1rem 0;
+  border-bottom: 1px dashed #ddd;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hitokoto-no {
+  color: #00bfff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  width: 50px;
+}
+
+.hitokoto-name {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.hitokoto-date {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.hitokoto-comment {
+  flex: 1;
+  word-break: break-all;
+}
+
+.hitokoto-page {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.hitokoto-page a {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin: 0 0.3rem;
+  background: #00bfff;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.hitokoto-page a:hover {
+  background: #0099cc;
+}
+
+.hitokoto-page strong {
+  background: #0066aa;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
