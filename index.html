@@ -93,7 +93,7 @@ async function updateToday() {
     // Vercelホスティングを考慮: /api/latest.json としてデプロイ想定
     // GitHub Pagesの場合: https://YOUR-USERNAME.github.io/vocalo-hof-db/latest.json
     // ここではVercel用に相対パス（/api/latest.json）を使用。実際のデプロイで調整
-    const res = await fetch("/api/latest.json?t=" + Date.now());
+    const res = await fetch("https://vocadb.potato.jp/latest.json?t=" + Date.now());
     const json = await res.ok ? await res.json() : null;
     
     if (json && json.data && json.data.length > 100) {
