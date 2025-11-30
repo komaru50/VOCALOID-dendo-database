@@ -105,7 +105,12 @@ const HALL_OF_FAME = [
 
 // 以下は完璧な全機能付きスクリプト（掲示板・動画ページ・P別・全曲一覧全部復活）
 let allData = [], db = null;
-const PROXIES = ["https://api.allorigins.win/raw?url=","https://corsproxy.io/?"];
+// 新（2025年現在生きてるプロキシ×3）
+const PROXIES = [
+  "https://corsproxy.io/?",
+  "https://api.codetabs.com/v1/proxy?quest=",
+  "https://thingproxy.freeboard.io/fetch/"
+];
 const dbReq = indexedDB.open("VocaloidHitokoto",1);
 dbReq.onupgradeneeded = e => e.target.result.createObjectStore("posts",{keyPath:"id",autoIncrement:true});
 dbReq.onsuccess = e => {db=e.target.result; if(location.hash==="#hitokoto") showHitokoto();};
@@ -133,7 +138,7 @@ async function forceUpdate(){
     document.querySelector(".loading").textContent=`取得中… ${i+1}/${HALL_OF_FAME.length}`;
   }
   localStorage.setItem("vdb_cache",JSON.stringify({data:allData,time:Date.now()}));
-  document.getElementById("last-update").textContent="最終更新: "+new Date().toLocaleString("ja-JP");
+ document.getElementById("last-update").textContent="最終更新: "+(obj.time?new Date(obj.time).toLocaleString("ja-JP"):"未取得");
   document.getElementById("update").disabled=false;
   render();
 }
