@@ -4,27 +4,36 @@
 <title>ボカロ殿堂入りデータベース - komaru50</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-body {font-family:'Noto Sans JP',sans-serif;background:#f0f8ff;margin:0;color:#222;}
-header {background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
-h1 {margin:0;font-size:2.5rem;}
-nav {background:#008fd5;color:white;padding:1rem;text-align:center;}
-nav a {color:white;margin:0 1rem;font-weight:bold;text-decoration:none;padding:0.5rem 1rem;border-radius:8px;}
-nav a:hover, nav a.active {background:#0066aa;}
-.container {max-width:1300px;margin:2rem auto;padding:0 1rem;}
-table {width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 10px 30px rgba(0,191,255,0.3);}
-th {background:#00bfff;color:white;padding:1.2rem;text-align:left;}
-td {padding:1rem;border-bottom:1px solid #eee;}
-tr:hover {background:#f0fbff;}
-a {color:#00bfff;font-weight:600;text-decoration:none;}
-.tag {display:inline-block;background:#00bfff;color:white;padding:0.5rem 1rem;border-radius:30px;margin:0.4rem;cursor:pointer;font-size:0.9rem;}
-.tag:hover {background:#0099cc;}
-.search-box {text-align:center;margin:2rem 0;}
-.search-box input {padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
-.card {background:white;padding:1.5rem;margin:1rem 0;border-radius:12px;box-shadow:0 4px 15px rgba(0,191,255,0.2);}
-.update-btn {position:absolute;top:20px;right:20px;background:#ff6b6b;color:white;border:none;padding:0.8rem 1.5rem;border-radius:50px;font-weight:bold;cursor:pointer;}
-.update-btn:hover {background:#ff5252;}
-.last-update {position:absolute;top:70px;right:20px;color:rgba(255,255,255,0.8);font-size:0.9rem;}
-.loading {text-align:center;padding:5rem;font-size:1.6rem;color:#0066aa;font-weight:bold;}
+body{font-family:'Noto Sans JP',sans-serif;background:#f0f8ff;margin:0;color:#222;}
+header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
+h1{margin:0;font-size:2.5rem;}
+nav{background:#008fd5;padding:1rem;text-align:center;}
+nav a{color:white;margin:0 1rem;font-weight:bold;text-decoration:none;padding:0.5rem 1rem;border-radius:8px;}
+nav a:hover,nav a.active{background:#0066aa;}
+.container{max-width:1300px;margin:2rem auto;padding:0 1rem;}
+table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 10px 30px rgba(0,191,255,0.3);}
+th{background:#00bfff;color:white;padding:1.2rem;}
+td{padding:1rem;border-bottom:1px solid #eee;}
+tr:hover{background:#f0fbff;}
+a{color:#00bfff;font-weight:600;text-decoration:none;}
+.tag{display:inline-block;background:#00bfff;color:white;padding:0.5rem 1rem;border-radius:30px;margin:0.4rem;cursor:pointer;font-size:0.9rem;}
+.tag:hover{background:#0099cc;}
+.search-box{text-align:center;margin:2rem 0;}
+.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
+.card{background:white;padding:1.5rem;margin:1rem 0;border-radius:12px;box-shadow:0 4px 15px rgba(0,191,255,0.2);}
+.update-btn{position:absolute;top:20px;right:20px;background:#ff6b6b;color:white;border:none;padding:0.8rem 1.5rem;border-radius:50px;font-weight:bold;cursor:pointer;}
+.update-btn:hover{background:#ff5252;}
+.last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,0.8);font-size:0.9rem;}
+.loading{text-align:center;padding:5rem;font-size:1.6rem;color:#0066aa;font-weight:bold;}
+#hitokoto-section{background:white;border-radius:15px;padding:2rem;margin:2rem auto;max-width:900px;box-shadow:0 10px 30px rgba(0,191,255,0.3);display:none;}
+#hitokoto-form{background:#f8f8f8;border:2px dashed #00bfff;padding:1.5rem;border-radius:10px;margin-bottom:2rem;text-align:center;}
+#hitokoto-name,#hitokoto-comment{padding:0.8rem;border-radius:8px;border:1px solid #00bfff;margin:0.5rem;}
+#hitokoto-submit{padding:0.8rem 2rem;background:#00bfff;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;}
+.hitokoto-item{padding:1rem 0;border-bottom:1px dashed #ddd;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
+.hitokoto-no{color:#00bfff;font-weight:bold;width:50px;}
+.hitokoto-name{color:#00bfff;font-weight:bold;}
+.hitokoto-comment{flex:1;}
+.hitokoto-date{color:#888;font-size:0.9rem;}
 </style>
 </head>
 <body>
@@ -49,88 +58,106 @@ a {color:#00bfff;font-weight:600;text-decoration:none;}
   <div class="loading">ニコニコから最新データを取得中…<br>約30秒で完成します！</div>
 </div>
 
+<div id="hitokoto-section">
+  <h2 style="text-align:center;color:#00bfff;">一言掲示板</h2>
+  <div id="hitokoto-form">
+    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20">
+    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ！" maxlength="100">
+    <button id="hitokoto-submit">書き込む</button>
+  </div>
+  <div id="hitokoto-list">読み込み中…</div>
+</div>
+
 <script>
-// あなたの全曲リスト（完全版・70曲以上全部入ってる）
-const HALL_OF_FAME = [{sm:"sm15630734",tags:["2011年","黒うさP","初音ミク","千本桜","神話入り"]},{sm:"sm1097445",tags:["2007年","ika_mo","初音ミク","みくみくにしてあげる","神話入り"]},{sm:"sm1715919",tags:["2007年","ryo","初音ミク","メルト","神話入り"]},{sm:"sm10759623",tags:["2010年","wowaka","ワールズエンド・ダンスホール","神話入り"]},{sm:"sm11809611",tags:["2010年","ハチ","マトリョシカ","神話入り"]},{sm:"sm31791630",tags:["2017年","wowaka","アンノウン・マザーグース","神話入り"]},{sm:"sm9714351",tags:["2010年","wowaka","ローリンガール","神話入り"]},{sm:"sm11398357",tags:["2010年","DECO*27","モザイクロール","神話入り"]},{sm:"sm24276234",tags:["2014年","Orangestar","アスノヨゾラ哨戒班","神話入り"]},{sm:"sm27965309",tags:["2016年","DECO*27","ゴーストルール","神話入り"]},{sm:"sm31606995",tags:["2017年","ハチ","砂の惑星","神話入り"]},{sm:"sm17520775",tags:["2012年","kemu","六兆年と一夜物語","神話入り"]},{sm:"sm14583646",tags:["2011年","164","天ノ弱","神話入り"]},{sm:"sm22138447",tags:["2013年","ハチ","ドーナツホール","神話入り"]},{sm:"sm22960446",tags:["2014年","ナブナ","ウミユリ海底譚","神話入り"]},{sm:"sm2937784",tags:["2008年","cosMo","初音ミクの消失","神話入り"]},{sm:"sm19133907",tags:["2012年","れるりり","脳漿炸裂ガール","神話入り"]},{sm:"sm31685272",tags:["2017年","DECO*27","ヒバナ","神話入り"]},{sm:"sm8082467",tags:["2009年","wowaka","裏表ラバーズ","神話入り"]},{sm:"sm6666016",tags:["2009年","doriko","ロミオとシンデレラ","神話入り"]},{sm:"sm3504435",tags:["2008年","ryo","ワールドイズマイン","神話入り"]},{sm:"sm39257413",tags:["2021年","いよわ","きゅうくらりん","神話入り"]},{sm:"sm32798041",tags:["2018年","みきとP","ロキ","神話入り"]},{sm:"sm33624822",tags:["2018年","かいりきベア","ベノム","神話入り"]},{sm:"sm38833751",tags:["2021年","ツミキ","フォニイ","神話入り"]},{sm:"sm20244918",tags:["2013年","Neru","ロストワンの号哭","神話入り"]},{sm:"sm39334235",tags:["2021年","ピノキオピー","神っぽいな"]},{sm:"sm15751190",tags:["2011年","じん","カゲロウデイズ"]},{sm:"sm43708803",tags:["2024年","サツキ","メズマライザー"]},{sm:"sm37287661",tags:["2020年","Kanaria","KING"]},{sm:"sm29822304",tags:["2016年","バルーン","シャルル"]},{sm:"sm24643818",tags:["2014年","Crusher-P","ECHO"]},{sm:"sm3645817",tags:["2008年","ryo","ブラック★ロックシューター"]},{sm:"sm31533883",tags:["2017年","Omoi","テオ"]},{sm:"sm39608927",tags:["2021年","ぬゆり","ロウワー"]},{sm:"nm6049209",tags:["2009年","アゴアニキ","ダブルラリアット"]},{sm:"sm34470195",tags:["2019年","DECO*27","乙女解剖"]},{sm:"sm39217773",tags:["2021年","柊マグネタイト","マーシャル・マキシマイザー"]},{sm:"sm18623327",tags:["2012年","みきとP","いーあるふぁんくらぶ"]},{sm:"sm37198038",tags:["2020年","稲葉曇","ラグトレイン"]},{sm:"sm12825985",tags:["2010年","Easypop","ハッピーシンセサイザ"]},{sm:"sm18406343",tags:["2012年","じん","チルドレンレコード"]},{sm:"sm30067009",tags:["2016年","DECO*27","妄想感傷代償連盟"]},{sm:"sm30156654",tags:["2016年","Orangestar","DAYBREAK FRONTLINE"]},{sm:"sm37441963",tags:["2020年","かいりきベア","ダーリンダンス"]},{sm:"sm33510542",tags:["2018年","ギガ","劣等上等"]},{sm:"sm34425299",tags:["2019年","syudou","ビターチョコデコレーション"]},{sm:"sm24892241",tags:["2014年","ナブナ","夜明けと蛍"]},{sm:"sm15172108",tags:["2011年","Mitchie M","FREELY TOMORROW"]},{sm:"sm14330479",tags:["2011年","wowaka","アンハッピーリフレイン"]},{sm:"sm15022913",tags:["2011年","40mP","からくりピエロ"]},{sm:"sm7550182",tags:["2009年","ハチ","結ンデ開イテ羅刹ト骸"]},{sm:"sm38387707",tags:["2021年","DECO*27","ヴァンパイア"]},{sm:"sm10393864",tags:["2010年","DECO*27","弱虫モンブラン"]},{sm:"sm29081909",tags:["2016年","Neru","脱法ロック"]},{sm:"sm30469574",tags:["2017年","ナユタン星人","太陽系デスコ"]},{sm:"sm30105817",tags:["2016年","かいりきベア","アルカリレットウセイ"]},{sm:"sm32727744",tags:["2018年","ユリイ・カノン","だれかの心臓になれたなら"]},{sm:"sm982882",tags:["2007年","Otomania","Ievan Polkka"]},{sm:"sm17720979",tags:["2012年","Last Note.","セツナトリップ"]},{sm:"sm6119955",tags:["2009年","samfree","ルカルカ★ナイトフィーバー"]},{sm:"sm20470051",tags:["2013年","じん","ロスタイムメモリー"]},{sm:"sm20116702",tags:["2013年","じん","夜咄ディセイブ"]},{sm:"sm43083649",tags:["2023年","吉田夜世","オーバーライド"]},{sm:"sm34871494",tags:["2019年","かいりきベア","アンヘル"]},{sm:"sm10444862",tags:["2010年","Junky","メランコリック"]},{sm:"sm1639267",tags:["2007年","シンP","卑怯戦隊うろたんだー"]},{sm:"sm42585649",tags:["2023年","原口沙輔","人マニア"]}];
+const HALL_OF_FAME = [{sm:"sm15630734",tags:["2011年","黒うさP","初音ミク","千本桜","神話入り"]},{sm:"sm1097445",tags:["2007年","ika_mo","初音ミク","みくみくにしてあげる","神話入り"]},{sm:"sm1715919",tags:["2007年","ryo","初音ミク","メルト","神話入り"]},{sm:"sm10759623",tags:["2010年","wowaka","初音ミク","巡音ルカ","ワールズエンド・ダンスホール","神話入り"]},{sm:"sm11809611",tags:["2010年","ハチ","初音ミク","GUMI","マトリョシカ","神話入り"]},{sm:"sm31791630",tags:["2017年","wowaka","初音ミク","アンノウン・マザーグース","神話入り"]},{sm:"sm9714351",tags:["2010年","wowaka","初音ミク","ローリンガール","神話入り"]},{sm:"sm11398357",tags:["2010年","DECO*27","GUMI","モザイクロール","神話入り"]},{sm:"sm24276234",tags:["2014年","Orangestar","IA","アスノヨゾラ哨戒班","神話入り"]},{sm:"sm27965309",tags:["2016年","DECO*27","初音ミク","ゴーストルール","神話入り"]},{sm:"sm31606995",tags:["2017年","ハチ","初音ミク","砂の惑星","神話入り"]},{sm:"sm17520775",tags:["2012年","kemu","IA","六兆年と一夜物語","神話入り"]},{sm:"sm14583646",tags:["2011年","164","GUMI","天ノ弱","神話入り"]},{sm:"sm22138447",tags:["2013年","ハチ","GUMI","ドーナツホール","神話入り"]},{sm:"sm22960446",tags:["2014年","ナブナ","初音ミク","ウミユリ海底譚","神話入り"]},{sm:"sm2937784",tags:["2008年","cosMo@暴走P","初音ミク","初音ミクの消失","神話入り"]},{sm:"sm19133907",tags:["2012年","れるりり","初音ミク","GUMI","脳漿炸裂ガール","神話入り"]},{sm:"sm31685272",tags:["2017年","DECO*27","初音ミク","ヒバナ","神話入り"]},{sm:"sm8082467",tags:["2009年","wowaka","初音ミク","裏表ラバーズ","神話入り"]},{sm:"sm6666016",tags:["2009年","doriko","初音ミク","ロミオとシンデレラ","神話入り"]},{sm:"sm3504435",tags:["2008年","ryo","初音ミク","ワールドイズマイン","神話入り"]},{sm:"sm39257413",tags:["2021年","いよわ","可不","きゅうくらりん","神話入り"]},{sm:"sm32798041",tags:["2018年","みきとP","鏡音リン","ロキ","神話入り"]},{sm:"sm33624822",tags:["2018年","かいりきベア","v_flower","ベノム","神話入り"]},{sm:"sm38833751",tags:["2021年","ツミキ","可不","フォニイ","神話入り"]},{sm:"sm20244918",tags:["2013年","Neru","鏡音リン","ロストワンの号哭","神話入り"]},{sm:"sm39334235",tags:["2021年","ピノキオピー","初音ミク","神っぽいな"]},{sm:"sm15751190",tags:["2011年","じん","初音ミク","カゲロウデイズ"]},{sm:"sm43708803",tags:["2024年","サツキ","初音ミク","重音テト","メズマライザー"]},{sm:"sm37287661",tags:["2020年","Kanaria","GUMI","KING"]},{sm:"sm29822304",tags:["2016年","バルーン","v_flower","シャルル"]},{sm:"sm24643818",tags:["2014年","Crusher-P","GUMI","ECHO"]},{sm:"sm3645817",tags:["2008年","ryo","初音ミク","ブラック★ロックシューター"]},{sm:"sm31533883",tags:["2017年","Omoi","初音ミク","テオ"]},{sm:"sm39608927",tags:["2021年","ぬゆり","v_flower","ロウワー"]},{sm:"nm6049209",tags:["2009年","アゴアニキ","巡音ルカ","ダブルラリアット"]},{sm:"sm34470195",tags:["2019年","DECO*27","初音ミク","乙女解剖"]},{sm:"sm39217773",tags:["2021年","柊マグネタイト","可不","マーシャル・マキシマイザー"]},{sm:"sm18623327",tags:["2012年","みきとP","鏡音リン","GUMI","いーあるふぁんくらぶ"]},{sm:"sm37198038",tags:["2020年","稲葉曇","歌愛ユキ","ラグトレイン"]},{sm:"sm12825985",tags:["2010年","Easypop","巡音ルカ","GUMI","ハッピーシンセサイザ"]},{sm:"sm18406343",tags:["2012年","じん","IA","チルドレンレコード"]},{sm:"sm30067009",tags:["2016年","DECO*27","初音ミク","妄想感傷代償連盟"]},{sm:"sm30156654",tags:["2016年","Orangestar","IA","DAYBREAK FRONTLINE"]},{sm:"sm37441963",tags:["2020年","かいりきベア","初音ミク","ダーリンダンス"]},{sm:"sm33510542",tags:["2018年","ギガ","鏡音リン","鏡音レン","劣等上等"]},{sm:"sm34425299",tags:["2019年","syudou","初音ミク","ビターチョコデコレーション"]},{sm:"sm24892241",tags:["2014年","ナブナ","初音ミク","夜明けと蛍"]},{sm:"sm15172108",tags:["2011年","Mitchie M","初音ミク","FREELY TOMORROW"]},{sm:"sm14330479",tags:["2011年","wowaka","初音ミク","アンハッピーリフレイン"]},{sm:"sm15022913",tags:["2011年","40mP","初音ミク","からくりピエロ"]},{sm:"sm7550182",tags:["2009年","ハチ","初音ミク","結ンデ開イテ羅刹ト骸"]},{sm:"sm38387707",tags:["2021年","DECO*27","初音ミク","ヴァンパイア"]},{sm:"sm10393864",tags:["2010年","DECO*27","GUMI","弱虫モンブラン"]},{sm:"sm29081909",tags:["2016年","Neru","鏡音レン","脱法ロック"]},{sm:"sm30469574",tags:["2017年","ナユタン星人","初音ミク","太陽系デスコ"]},{sm:"sm30105817",tags:["2016年","かいりきベア","初音ミク","アルカリレットウセイ"]},{sm:"sm32727744",tags:["2018年","ユリイ・カノン","GUMI","だれかの心臓になれたなら"]},{sm:"sm982882",tags:["2007年","Otomania","初音ミク","Ievan Polkka"]},{sm:"sm17720979",tags:["2012年","Last Note.","GUMI","セツナトリップ"]},{sm:"sm6119955",tags:["2009年","samfree","巡音ルカ","ルカルカ★ナイトフィーバー"]},{sm:"sm20470051",tags:["2013年","じん","IA","ロスタイムメモリー"]},{sm:"sm20116702",tags:["2013年","じん","IA","夜咄ディセイブ"]},{sm:"sm43083649",tags:["2023年","吉田夜世","重音テト","オーバーライド"]},{sm:"sm34871494",tags:["2019年","かいりきベア","鳴花ミコト","アンヘル"]},{sm:"sm10444862",tags:["2010年","Junky","鏡音リン","メランコリック"]},{sm:"sm1639267",tags:["2007年","シンP","卑怯戦隊うろたんだー"]},{sm:"sm42585649",tags:["2023年","原口沙輔","重音テト","人マニア"]}];
 
-let allData = [];
+let allData = [], db = null;
+const PROXIES = ["https://corsproxy.io/?","https://api.codetabs.com/v1/proxy?quest=","https://thingproxy.freeboard.io/fetch/"];
 
-// 2025年12月現在100％生きてるプロキシ（俺が今朝全部確認済み）
-const PROXIES = [
-  "https://corsproxy.io/?",
-  "https://api.codetabs.com/v1/proxy?quest=",
-  "https://thingproxy.freeboard.io/fetch/"
-];
+const dbReq = indexedDB.open("VocaloidDB",1);
+dbReq.onupgradeneeded = e => e.target.result.createObjectStore("hitokoto",{keyPath:"id",autoIncrement:true});
+dbReq.onsuccess = e => {db = e.target.result; if(location.hash==="#hitokoto") showHitokoto();};
 
 async function getInfo(sm){
   for(const p of PROXIES){
     try{
-      const url = p + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/"+sm);
-      const res = await fetch(url, {signal: AbortSignal.timeout(12000)});
+      const res = await fetch(p + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/"+sm),{signal:AbortSignal.timeout(12000)});
       if(!res.ok) continue;
       const txt = await res.text();
       if(txt.includes("<error>")) continue;
       const xml = new DOMParser().parseFromString(txt,"text/xml");
       const g = t => xml.querySelector(t)?.textContent.trim()||"";
-      return {
-        sm,
-        title: g("title")||"（不明）",
-        uploader: g("user_nickname")||g("ch_name")||"不明",
-        view: Number(g("view_counter"))||0,
-        date: g("first_retrieve")?.slice(0,10)||"??"
-      };
-    }catch(e){}
+      const entry = HALL_OF_FAME.find(x=>x.sm===sm);
+      return {sm,title:g("title"),uploader:g("user_nickname")||g("ch_name")||"不明",view:+g("view_counter")||0,date:g("first_retrieve")?.slice(0,10)||"??" ,tags:entry?entry.tags:[]};
+    }catch{}
   }
-  return {sm, title:"取得失敗", uploader:"-", view:0, date:"??"};
+  return {sm,title:"取得失敗",uploader:"-",view:0,date:"??",tags:[]};
 }
 
 async function updateData(){
-  document.getElementById("update").disabled = true;
-  document.getElementById("main").innerHTML = `<div class="loading">ニコニコから最新データを取得中…<br>約30秒で完成します！</div>`;
-  allData = [];
-  for(let i=0; i<HALL_OF_FAME.length; i++){
+  document.getElementById("update").disabled=true;
+  document.getElementById("main").innerHTML=`<div class="loading">取得中… 0/${HALL_OF_FAME.length}</div>`;
+  allData=[];
+  for(let i=0;i<HALL_OF_FAME.length;i++){
     const info = await getInfo(HALL_OF_FAME[i].sm);
     allData.push(info);
-    document.querySelector(".loading").innerHTML = `取得中…<br><b>${i+1} / ${HALL_OF_FAME.length}</b><br>${info.title}`;
+    document.querySelector(".loading").innerHTML=`取得中…<br><b>${i+1}/${HALL_OF_FAME.length}</b><br>${info.title||"..."}`;
   }
-  localStorage.setItem("vdb2025_dec", JSON.stringify({data:allData, time:Date.now()}));
-  document.getElementById("last-update").textContent = "最終更新: " + new Date().toLocaleString("ja-JP");
-  document.getElementById("update").disabled = false;
+  localStorage.setItem("vdb_full2025",JSON.stringify({data:allData,time:Date.now()}));
+  document.getElementById("last-update").textContent="最終更新: "+new Date().toLocaleString("ja-JP");
+  document.getElementById("update").disabled=false;
   render();
 }
 
 function render(){
-  const q = document.getElementById("search").value.toLowerCase();
-  const filtered = allData.filter(v => 
-    v.title.toLowerCase().includes(q) || 
-    v.uploader.toLowerCase().includes(q)
-  );
+  document.querySelectorAll("nav a").forEach(a=>a.classList.remove("active"));
+  const active = document.querySelector(`nav a[href="${location.hash||'#home'}"]`);
+  if(active) active.classList.add("active");
+  document.getElementById("hitokoto-section").style.display = location.hash==="#hitokoto"?"block":"none";
 
-  let html = `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>`;
-  filtered.sort((a,b)=>b.view - a.view).forEach((v,i)=>{
-    html += `<tr>
-      <td style="text-align:center;font-weight:bold;color:#00bfff;">${i+1}位</td>
-      <td><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td>
-      <td>${v.uploader}</td>
-      <td style="text-align:right;font-weight:bold;">${v.view.toLocaleString()}回</td>
-    </tr>`;
-  });
-  html += `</tbody></table>`;
-  document.getElementById("main").innerHTML = html;
+  const q = document.getElementById("search").value.toLowerCase();
+  const list = allData.filter(v=>v.title.toLowerCase().includes(q)||v.uploader.toLowerCase().includes(q)||v.tags.some(t=>t.toLowerCase().includes(q)));
+
+  let html = `<div style="text-align:center;margin:1rem;color:#555;">表示中：${list.length}曲 / 全${allData.length}曲</div>`;
+
+  if(location.hash==="#list"){
+    list.forEach(v=>html+=`<div class="card"><h3><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></h3><p>${v.uploader} • ${v.date} • ${v.view.toLocaleString()}回<br>${v.tags.map(t=>`<span class="tag" onclick="document.getElementById('search').value='${t}';render()">${t}</span>`).join("")}</p></div>`);
+  }else if(location.hash==="#p"){
+    const pcount = {};
+    list.forEach(v=>pcount[v.uploader]=(pcount[v.uploader]||0)+1);
+    const ranked = Object.entries(pcount).map(([n,c])=>({name:n,cnt:c})).sort((a,b)=>b.cnt-a.cnt);
+    html+="<table><thead><tr><th>#</th><th>P名</th><th>殿堂入り数</th></tr></thead><tbody>"+ranked.map((v,i)=>`<tr><td>${i+1}</td><td>${v.name}</td><td>${v.cnt}曲</td></tr>`).join("")+"</tbody></table>";
+  }else{
+    html+="<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
+    list.sort((a,b)=>b.view-a.view).forEach((v,i)=>html+=`<tr><td style="text-align:center;font-weight:bold;color:#00bfff;">${i+1}位</td><td><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td><td>${v.uploader}</td><td style="text-align:right;">${v.view.toLocaleString()}回</td></tr>`);
+    html+="</tbody></table>";
+  }
+  document.getElementById("main").innerHTML=html;
 }
 
-// 起動時にキャッシュがあれば即表示、なければ強制取得
-const cache = localStorage.getItem("vdb2025_dec");
+function showHitokoto(){
+  const tx=db.transaction("hitokoto","readonly").objectStore("hitokoto").getAll();
+  tx.onsuccess=()=>document.getElementById("hitokoto-list").innerHTML=tx.result.reverse().map((p,i)=>`<div class="hitokoto-item"><span class="hitokoto-no">${i+1}</span><span class="hitokoto-name">${p.name||'名無し'}</span><span class="hitokoto-comment">${p.comment}</span><span class="hitokoto-date">${p.date}</span></div>`).join("")||"まだ書き込みがありません";
+}
+document.getElementById("hitokoto-submit").onclick=()=>{
+  const name=document.getElementById("hitokoto-name").value.trim()||"名無し";
+  const comment=document.getElementById("hitokoto-comment").value.trim();
+  if(!comment) return alert("一言を書いてね！");
+  db.transaction("hitokoto","readwrite").objectStore("hitokoto").add({name,comment,date:new Date().toLocaleString("ja-JP")}).onsuccess=()=>{document.getElementById("hitokoto-comment").value="";showHitokoto();}
+};
+
+const cache=localStorage.getItem("vdb_full2025");
 if(cache){
-  const obj = JSON.parse(cache);
-  allData = obj.data;
-  document.getElementById("last-update").textContent = "最終更新: " + new Date(obj.time).toLocaleString("ja-JP");
+  const obj=JSON.parse(cache);
+  allData=obj.data;
+  document.getElementById("last-update").textContent="最終更新: "+new Date(obj.time).toLocaleString("ja-JP");
   render();
 } else {
   updateData();
 }
 
-document.getElementById("update").onclick = updateData;
-document.getElementById("search").oninput = render;
+document.getElementById("update").onclick=updateData;
+document.getElementById("search").oninput=render;
+window.onhashchange=()=>{render(); if(location.hash==="#hitokoto") showHitokoto();}
 </script>
 </body></html>
