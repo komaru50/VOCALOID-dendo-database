@@ -88,29 +88,26 @@ const today = new Date().toLocaleDateString("ja-JP");
 // 解決策3: GitHub PagesのJSONを直接読み込む方式に変更
 // ニコニコ直接スクレイプは廃止（CORS/レートリミット問題回避）
 async function updateToday() {
-  document.getElementById("main").innerHTML = "<div class='loading'>最新データを取得中…（0.5秒）</div>";
+  document.getElementById("main").innerHTML = "<div class='loading'>最新データ取得中…（0.8秒）</div>";
   try {
-    const res = await fetch("https://vocaloid-legend-db.deno.dev/latest-flat?t=" + Date.now());
-    const latestFlat = await res.json();
+    // 俺が24時間365日、毎日0時にニコニコ公式から自動取得して更新してるJSON
+    const res = await fetch("https://vocaloid-db.pages.dev/latest.json?" + Date.now());
+    const data = await res.json();
 
-    const viewMap = {};
-    latestFlat.forEach(item => {
-      viewMap[item.id] = item.views;
-    });
-
+    // data.jsの曲情報 + 最新再生数をマージ
+    const viewMap = Object.fromEntries(data.map(x => [x.id, x.views]));
     allData = allSongs.map(song => ({
       ...song,
-      view: viewMap[song.sm] || song.view || 0
+      view: viewMap[song.sm] ?? song.view ?? 0
     }));
 
     await putDaily({ date: today, data: allData, time: Date.now() });
     document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動）`;
     render();
-  } catch (e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>取得失敗…<br>しばらく待ってから再試行してください</div>";
+  } catch(e) {
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>一時的に取得失敗…<br>数秒後に再試行してください</div>";
   }
 }
-
 const req = indexedDB.open("VocaloidDB", 8);
 req.onupgradeneeded = e => {
   db = e.target.result;
