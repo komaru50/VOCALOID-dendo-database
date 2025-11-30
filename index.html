@@ -85,23 +85,31 @@ const PAGE_SIZE = 30;
 let allData = [], db = null, currentPage = 1;
 const today = new Date().toLocaleDateString("ja-JP");
 
-// 新方式：ニコニコの公式ページから直接スクレイプ（CORS回避）
-async function getInfoViaNicoPage(sm) {
+// 解決策3: GitHub PagesのJSONを直接読み込む方式に変更
+// ニコニコ直接スクレイプは廃止（CORS/レートリミット問題回避）
+async function updateToday() {
+  document.getElementById("main").innerHTML = "<div class='loading'>最新データを取得中…（5秒くらい）</div>";
   try {
-    const res = await fetch(`https://www.nicovideo.jp/watch/${sm}`);
-    const text = await res.text();
-    const dom = new DOMParser().parseFromString(text, "text/html");
+    // Vercelホスティングを考慮: /api/latest.json としてデプロイ想定
+    // GitHub Pagesの場合: https://YOUR-USERNAME.github.io/vocalo-hof-db/latest.json
+    // ここではVercel用に相対パス（/api/latest.json）を使用。実際のデプロイで調整
+    const res = await fetch("/api/latest.json?t=" + Date.now());
+    const json = await res.ok ? await res.json() : null;
     
-    const title = dom.querySelector('meta[property="og:title"]')?.content || "不明";
-    const view = dom.querySelector('.VideoViewCount__value')?.textContent?.replace(/[^0-9]/g,'') || "0";
-    const uploader = dom.querySelector('.ChannelInfo-name a')?.textContent?.trim() || 
-                    dom.querySelector('.VideoOwnerInfo-userName')?.textContent?.trim() || "不明";
-    const date = dom.querySelector('meta[property="video:release_date"]')?.content?.slice(0,10) || "??";
-    
-    const entry = HALL_OF_FAME.find(x => x.sm === sm);
-    return { sm, title, uploader, view: +view, date, tags: entry?.tags || [] };
+    if (json && json.data && json.data.length > 100) {
+      allData = json.data;
+      await putDaily({ date: today, data: allData, time: Date.now() });
+      document.getElementById("last-update").textContent = `最終更新：${new Date(json.time).toLocaleString("ja-JP")}（自動）`;
+      render();
+    } else {
+      throw new Error("データ形式エラー");
+    }
   } catch(e) {
-    return { sm, title: "取得失敗", uploader: "-", view: 0, date: "??", tags: [] };
+    // フォールバック: GitHub Pages URLを指定（ユーザー名を置き換え）
+    // 実際の使用時は const GITHUB_URL = "https://YOUR-USERNAME.github.io/vocalo-hof-db/latest.json";
+    // const res = await fetch(`${GITHUB_URL}?t=${Date.now()}`);
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>取得失敗…<br>GitHub Actionsの更新を確認するか、手動でlatest.jsonをアップロードしてください</div>";
+    console.error(e);
   }
 }
 
@@ -120,25 +128,12 @@ async function init() {
     allData = cached.data;
     document.getElementById("last-update").textContent = `最終更新：${new Date(cached.time).toLocaleString("ja-JP")}`;
   } else {
-    document.getElementById("main").innerHTML = "<div class='loading'>初回起動中…<br>「今日のデータを更新」ボタンを押してください</div>";
+    // 初回は自動で更新実行（解決策3の自動化対応）
+    await updateToday();
   }
   render();
   loadHitokoto();
   document.getElementById("darkmode").onclick = () => document.body.classList.toggle("dark");
-}
-
-async function updateToday() {
-  document.getElementById("main").innerHTML = "<div class='loading'>取得中…（数分かかります）</div>";
-  const newData = [];
-  for (let i = 0; i < HALL_OF_FAME.length; i++) {
-    const info = await getInfoViaNicoPage(HALL_OF_FAME[i].sm);
-    newData.push(info);
-    document.querySelector(".loading").innerHTML = `取得中… ${i+1}/${HALL_OF_FAME.length}<br>${info.title}`;
-  }
-  allData = newData;
-  await putDaily({ date: today, data: newData, time: Date.now() });
-  document.getElementById("last-update").textContent = `更新完了：${new Date().toLocaleString("ja-JP")}`;
-  render();
 }
 
 async function getDaily(d) { return new Promise(r => db.transaction("daily").objectStore("daily").get(d).onsuccess = e => r(e.target.result)); }
