@@ -1,34 +1,44 @@
 <!DOCTYPE html>
-<html lang="ja"><head>
+<html lang="ja">
+<head>
 <meta charset="UTF-8">
 <title>ボカロ殿堂入りデータベース - komaru50</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-body{font-family:'Noto Sans JP',sans-serif;background:#f0f8ff;margin:0;color:#222;}
-header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
+body{font-family:'Noto Sans JP',sans-serif;background:#f0f8ff;color:#222;margin:0;transition:.3s;}
+body.dark{background:#121212;color:#eee;}
+header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;box-shadow:0 8px 32px rgba(0,191,255,.4);}
 h1{margin:0;font-size:2.5rem;}
 nav{background:#008fd5;padding:1rem;text-align:center;}
-nav a{color:white;margin:0 1rem;font-weight:bold;text-decoration:none;padding:0.5rem 1rem;border-radius:8px;}
-nav a:hover,nav a.active{background:#0066aa;}
+nav a{color:white;margin:0 1rem;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:bold;transition:.2s;}
+nav a.active,nav a:hover{background:#0066aa;}
 .container{max-width:1300px;margin:2rem auto;padding:0 1rem;}
-table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 10px 30px rgba(0,191,255,0.3);}
+.search-box{text-align:center;margin:2rem 0;}
+.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
+table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 10px 30px rgba(0,191,255,.3);margin-bottom:2rem;}
+body.dark table{background:#1e1e1e;}
 th{background:#00bfff;color:white;padding:1.2rem;}
 td{padding:1rem;border-bottom:1px solid #eee;}
 tr:hover{background:#f0fbff;}
-a{color:#00bfff;font-weight:600;text-decoration:none;}
-.tag{display:inline-block;background:#00bfff;color:white;padding:0.5rem 1rem;border-radius:30px;margin:0.4rem;cursor:pointer;font-size:0.9rem;}
+body.dark tr:hover{background:#2a2a2a;}
+a{color:#00bfff;text-decoration:none;font-weight:600;}
+.tag{display:inline-block;background:#00bfff;color:white;padding:.4rem .9rem;border-radius:30px;margin:.3rem;font-size:.9rem;cursor:pointer;}
 .tag:hover{background:#0099cc;}
-.search-box{text-align:center;margin:2rem 0;}
-.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
-.card{background:white;padding:1.5rem;margin:1rem 0;border-radius:12px;box-shadow:0 4px 15px rgba(0,191,255,0.2);}
-.update-btn{position:absolute;top:20px;right:20px;background:#ff6b6b;color:white;border:none;padding:0.8rem 1.5rem;border-radius:50px;font-weight:bold;cursor:pointer;}
-.update-btn:hover{background:#ff5252;}
-.last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,0.8);font-size:0.9rem;}
+.update-btn{position:absolute;top:20px;right:20px;background:#ff4444;color:white;border:none;padding:.8rem 1.5rem;border-radius:50px;font-weight:bold;cursor:pointer;}
+.last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,.9);font-size:.9rem;}
+#darkmode{position:absolute;top:20px;left:20px;background:#333;color:white;padding:.8rem;border-radius:50%;cursor:pointer;font-size:1.2rem;}
+.fav{cursor:pointer;font-size:1.4rem;margin-right:.5rem;}
+.fav.on{color:#ff4444;}
+.diff{font-weight:bold;margin-left:.5rem;}
+.diff.up{color:#0a0;}
+.diff.down{color:#d00;}
 .loading{text-align:center;padding:5rem;font-size:1.6rem;color:#0066aa;font-weight:bold;}
-#hitokoto-section{background:white;border-radius:15px;padding:3rem;margin:3rem auto;max-width:900px;box-shadow:0 15px 40px rgba(0,191,255,0.3);}
-#hitokoto-form{background:#f0fbff;border-radius:12px;padding:2rem;margin-bottom:2rem;text-align:center;}
-#hitokoto-name,#hitokoto-comment{padding:1rem;border-radius:50px;border:2px solid #00bfff;margin:0.5rem;width:280px;font-size:1.1rem;}
-#hitokoto-submit{padding:1rem 3rem;background:#00bfff;color:white;border:none;border-radius:50px;font-weight:bold;cursor:pointer;font-size:1.2rem;}
+.pagination{text-align:center;margin:3rem 0;}
+.pagination button{padding:.8rem 1.5rem;margin:0 .3rem;border:none;border-radius:8px;background:#00bfff;color:white;font-weight:bold;cursor:pointer;}
+.pagination button:disabled{background:#aaa;cursor:not-allowed;}
+.pagination button.active{background:#0066aa;}
+#hitokoto-section{background:white;border-radius:15px;padding:3rem;margin:3rem auto;max-width:900px;box-shadow:0 15px 40px rgba(0,191,255,.3);display:none;}
+body.dark #hitokoto-section{background:#1e1e1e;}
 .hitokoto-item{padding:1.2rem 0;border-bottom:1px dashed #bde0fe;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
 .hitokoto-no{color:#00bfff;font-weight:bold;font-size:1.3rem;width:50px;text-align:center;}
 .hitokoto-name{color:#00bfff;font-weight:bold;}
@@ -37,449 +47,261 @@ a{color:#00bfff;font-weight:600;text-decoration:none;}
 </style>
 </head>
 <body>
+
 <header>
   <h1>ボカロ殿堂入りデータベース</h1>
-  <button class="update-btn" id="update">最新情報に更新</button>
-  <div class="last-update" id="last-update">最終更新: 未取得</div>
+  <button class="update-btn" id="update">今日のデータ更新</button>
+  <div class="last-update" id="last-update">読み込み中…</div>
+  <div id="darkmode" title="ダークモード">Night</div>
 </header>
 
 <nav>
-  <a href="#home" class="active">再生数ランキング</a>
+  <a href="#home" class="active">ランキング</a>
   <a href="#list">全曲一覧</a>
-  <a href="#p">P別殿堂入り数</a>
-  <a href="#hitokoto">一言掲示板</a>
+  <a href="#p">P別</a>
+  <a href="#fav">お気に入り</a>
+  <a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
   <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
 </div>
 
-<div class="container" id="main">
-  <div class="loading">ニコニコから最新データを取得中…<br>約30秒で完成します！</div>
-</div>
+<div class="container" id="main"></div>
+<div class="pagination" id="pagination"></div>
 
-<!-- 掲示板専用ページ（ここだけ表示） -->
-<div id="hitokoto-section" style="display:none;">
+<div id="hitokoto-section">
   <h2 style="text-align:center;color:#00bfff;font-size:2.5rem;margin-bottom:1.5rem;">一言掲示板</h2>
-  <div id="hitokoto-form">
-    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20">
-    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ！（最大100文字）" maxlength="100">
-    <button id="hitokoto-submit">書き込む</button>
+  <div style="background:#f0fbff;padding:2rem;border-radius:12px;text-align:center;margin-bottom:2rem;">
+    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:200px;">
+    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ！" maxlength="100" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:300px;">
+    <button id="hitokoto-submit" style="padding:.8rem 2rem;background:#00bfff;color:white;border:none;border-radius:50px;font-weight:bold;">書き込む</button>
   </div>
-  <div id="hitokoto-list">読み込み中…</div>
+  <div id="hitokoto-list"></div>
 </div>
 
+<script src="data.js"></script>
 <script>
-// data.js - 殿堂入り曲を手動でどんどん追加してください！
-const HALL_OF_FAME = [
-  {
-    sm: "sm15630734",
-    tags: ["2011年", "黒うさP", "初音ミク", "千本桜","神話入り"]
-  },
-  {
-    sm: "sm1097445",
-    tags: ["2007年", "ika-mo", "初音ミク", "みくみくにしてあげる♪【してやんよ】","神話入り"]
-  },
-  {
-    sm: "sm1715919",
-    tags: ["2007年", "ryo", "初音ミク", "メルト","神話入り"]
-  },
-  {
-    sm: "sm10759623",
-    tags: ["2010年", "wowaka", "初音ミク","巡音ルカ", "ワールズエンド・ダンスホール","神話入り"]
-  },
-  {
-    sm: "sm11809611",
-    tags: ["2010年", "ハチ", "初音ミク","GUMI", "マトリョシカ","神話入り"]
-  },
-  {
-    sm: "sm31791630",
-    tags: ["2017年", "wowaka", "初音ミク", "アンノウン・マザーグース","神話入り"]
-  },
-  {
-    sm: "sm9714351",
-    tags: ["2010年", "wowaka", "初音ミク", "ローリンガール","神話入り"]
-  },
-  {
-    sm: "sm11398357",
-    tags: ["2010年", "DECO*27", "GUMI", "モザイクロール","神話入り"]
-  },
-  {
-    sm: "sm24276234",
-    tags: ["2014年", "Orangestar", "IA", "アスノヨゾラ哨戒班","神話入り"]
-  },
-  {
-    sm: "sm27965309",
-    tags: ["2016年", "DECO*27", "初音ミク", "ゴーストルール","神話入り"]
-  },
-  {
-    sm: "sm31606995",
-    tags: ["2017年", "ハチ", "初音ミク", "砂の惑星","伝説入り最速曲","神話入り"]
-  },
-  {
-    sm: "sm17520775",
-    tags: ["2012年", "kemu", "IA", "六兆年と一夜物語","神話入り"]
-  },
-  {
-    sm: "sm14583646",
-    tags: ["2011年", "164", "GUMI", "天ノ弱","神話入り"]
-  },
-  {
-    sm: "sm22138447",
-    tags: ["2013年", "ハチ", "GUMI", "ドーナツホール","神話入り"]
-  },
-  {
-    sm: "sm22960446",
-    tags: ["2014年", "ナブナ", "初音ミク", "ウミユリ海底譚","神話入り"]
-  },
-  {     
-    sm: "sm2937784",     
-    tags: ["2008年", "cosMo@暴走P", "暴走P","初音ミク", "初音ミクの消失(LONG VERSION)","神話入り"]   
-  },
-  {     
-    sm: "sm19133907",     
-    tags: ["2012年", "れるりり", "初音ミク","GUMI", "脳漿炸裂ガール","神話入り"]   
-  },
-  {     
-    sm: "sm31685272",     
-    tags: ["2017年", "DECO*27", "初音ミク", "ヒバナ","神話入り"]   
-  },
-  {     
-    sm: "sm8082467",     
-    tags: ["2009年", "wowaka", "初音ミク", "裏表ラバーズ","神話入り"]   
-  },
-  {     
-    sm: "sm6666016",     
-    tags: ["2009年", "doriko","初音ミク", "ロミオとシンデレラ","神話入り"]   
-  },
-  {     
-    sm: "sm3504435",     
-    tags: ["2008年", "ryo", "初音ミク", "ワールドイズマイン","神話入り"]   
-  },
-{     
-  sm: "sm39257413",     
-  tags: ["2021年", "いよわ", "可不", "きゅうくらりん","神話入り"]   
-},
-{     
-  sm: "sm32798041",     
-  tags: ["2018年", "みきとP", "鏡音リン", "ロキ","神話入り"]   
-},
-{     
-  sm: "sm33624822",     
-  tags: ["2018年", "かいりきベア", "v_flower", "ベノム","神話入り"]   
-},
-{     
-  sm: "sm8089993",     
-  tags: ["2009年", "iroha", "鏡音リン", "炉心融解","神話入り","再投稿"]   
-},
-{     
-  sm: "sm38833751",     
-  tags: ["2021年", "ツミキ", "可不", "フォニイ","神話入り"]   
-},
-{     
-  sm: "sm20244918",     
-  tags: ["2013年", "Neru", "鏡音リン", "ロストワンの号哭","神話入り"]   
-},
-{     
-  sm: "sm39334235",     
-  tags: ["2021年", "ピノキオピー", "初音ミク", "神っぽいな","伝説入り"]   
-},
-{     
-  sm: "sm15751190",     
-  tags: ["2011年", "じん(自然の敵P)", "初音ミク", "カゲロウデイズ","伝説入り"]   
-},
-{     
-  sm: "sm30177801",     
-  tags: ["2016年", "ナユタン星人", "初音ミク", "ダンスロボットダンス","伝説入り"]   
-},
-{     
-  sm: "sm43708803",     
-  tags: ["2024年", "サツキ", "初音ミク","重音テト","SynthesizerV", "メズマライザー","伝説入り"]   
-},
-{     
-  sm: "sm13386216",     
-  tags: ["2011年", "ハチ", "GUMI", "パンダヒーロー","伝説入り"]   
-},
-{     
-  sm: "sm36053074",     
-  tags: ["2019年", "john", "初音ミク", "春嵐","伝説入り"]   
-},
-{     
-  sm: "sm28576299",     
-  tags: ["2016年", "ナユタン星人", "初音ミク", "エイリアンエイリアン","伝説入り"]   
-},
-{     
-  sm: "sm29822304",     
-  tags: ["2016年", "バルーン", "v_flower", "シャルル","伝説入り"]   
-},
-{     
-  sm: "sm24643818",     
-  tags: ["2014年", "Crusher-P", "GUMI", "ECHO","伝説入り"]   
-},
-{     
-  sm: "sm3645817",     
-  tags: ["2008年", "ryo", "初音ミク", "ブラック★ロックシューター","伝説入り"]   
-},
-{     
-  sm: "sm37287661",     
-  tags: ["2020年", "Kanaria", "GUMI", "KING","伝説入り"]   
-},
-{     
-  sm: "sm31533883",     
-  tags: ["2017年", "Omoi", "初音ミク", "テオ","伝説入り"]   
-},
-{     
-  sm: "sm39608927",     
-  tags: ["2021年", "ぬゆり", "v_flower", "ロウワー","伝説入り"]   
-},
-{     
-  sm: "nm6049209",     
-  tags: ["2009年", "アゴアニキ","巡音ルカ", "ダブルラリアット","伝説入り"]   
-},
-{     
-  sm: "sm34470195",     
-  tags: ["2019年", "DECO*27", "初音ミク", "乙女解剖","伝説入り"]   
-},
-{     
-  sm: "sm39217773",     
-  tags: ["2021年", "柊マグネタイト", "可不", "マーシャル・マキシマイザー","伝説入り"]   
-},
-{     
-  sm: "sm18623327",     
-  tags: ["2012年", "みきとP", "鏡音リン","GUMI", "いーあるふぁんくらぶ","伝説入り"]   
-},
-{     
-  sm: "sm37198038",     
-  tags: ["2020年", "稲葉曇", "歌愛ユキ", "ラグトレイン","伝説入り"]   
-},
-{     
-  sm: "sm12825985",     
-  tags: ["2010年", "Easypop","巡音ルカ","GUMI", "ハッピーシンセサイザ","伝説入り"]   
-},
-{     
-  sm: "sm18406343",     
-  tags: ["2012年", "じん(自然の敵P)", "IA", "チルドレンレコード","伝説入り"]   
-},
-{     
-  sm: "sm30067009",     
-  tags: ["2016年", "DECO*27", "初音ミク", "妄想感傷代償連盟","伝説入り"]   
-},
-{     
-  sm: "sm30156654",     
-  tags: ["2016年", "Orangestar", "IA", "DAYBREAK FRONTLINE","伝説入り"]   
-},
-{     
-  sm: "sm37441963",     
-  tags: ["2020年", "かいりきベア", "初音ミク", "ダーリンダンス","伝説入り"]   
-},
-{     
-  sm: "sm33510542",     
-  tags: ["2018年", "ギガ", "鏡音リン","鏡音レン", "劣等上等","伝説入り"]   
-},
-{     
-  sm: "sm34425299",     
-  tags: ["2019年", "syudou", "初音ミク", "ビターチョコデコレーション","伝説入り"]   
-},
-{     
-  sm: "sm24892241",     
-  tags: ["2014年", "ナブナ", "初音ミク", "夜明けと蛍","伝説入り"]   
-},
-{     
-  sm: "sm15172108",     
-  tags: ["2011年", "Mitchie M", "初音ミク", "FREELY TOMORROW","伝説入り"]   
-},
-{     
-  sm: "sm14330479",     
-  tags: ["2011年", "wowaka", "初音ミク", "アンハッピーリフレイン","伝説入り"]   
-},
-{     
-  sm: "sm15022913",     
-  tags: ["2011年", "40㍍P", "初音ミク", "からくりピエロ","伝説入り"]   
-},
-{     
-  sm: "sm7550182",     
-  tags: ["2009年", "ハチ", "初音ミク", "結ンデ開イテ羅刹ト骸","伝説入り"]   
-},
-{     
-  sm: "sm38387707",     
-  tags: ["2021年", "DECO*27", "初音ミク", "ヴァンパイア","伝説入り"]   
-},
-{     
-  sm: "sm10393864",     
-  tags: ["2010年", "DECO*27", "GUMI", "弱虫モンブラン","伝説入り"]   
-},
-{     
-  sm: "sm32492001",     
-  tags: ["2017年", "ココアシガレットP", "琴葉茜","結月ゆかり","弦巻マキ","東北きりたん", "Seyana.","何でも言うことを聞いてくれるアカネチャン","伝説入り"]     
-},
-{     
-  sm: "sm29081909",     
-  tags: ["2016年", "Neru", "鏡音レン", "脱法ロック","伝説入り"]   
-},
-{     
-  sm: "sm30469574",     
-  tags: ["2017年", "ナユタン星人", "初音ミク", "太陽系デスコ","伝説入り"]   
-},
-{     
-  sm: "sm30105817",     
-  tags: ["2016年", "かいりきベア", "初音ミク", "アルカリレットウセイ","伝説入り"]   
-},
-{     
-  sm: "sm32727744",     
-  tags: ["2018年", "ユリイ・カノン", "GUMI", "だれかの心臓になれたなら","伝説入り"]   
-},
-{     
-  sm: "sm28276238",     
-  tags: ["2016年", "くらげP", "結月ゆかり", "チュルリラ・チュルリラ・ダッダッダ！","伝説入り"]   
-},
-{     
-  sm: "sm982882",     
-  tags: ["2007年", "Otomania", "初音ミク","VOCALOIDカバー曲", "Ievan Polkka","伝説入り"]   
-},
-{     
-  sm: "sm17720979",     
-  tags: ["2012年", "Last Note.", "GUMI", "セツナトリップ","伝説入り"]   
-},
-{     
-  sm: "sm6119955",     
-  tags: ["2009年", "samfree","巡音ルカ", "ルカルカ★ナイトフィーバー","伝説入り"]   
-},
-{     
-  sm: "sm20470051",     
-  tags: ["2013年", "じん(自然の敵P)", "IA", "ロスタイムメモリー","伝説入り"]   
-},
-{     
-  sm: "sm20116702",     
-  tags: ["2013年", "じん(自然の敵P)", "IA", "夜咄ディセイブ","伝説入り"]   
-},
-{     
-  sm: "sm43083649",     
-  tags: ["2023年", "吉田夜世", "重音テト", "オーバーライド","伝説入り"]   
-},
-{     
-  sm: "sm34871494",     
-  tags: ["2019年", "かいりきベア", "鳴花ミコト", "アンヘル","伝説入り"]   
-},
-{     
-  sm: "sm10444862",     
-  tags: ["2010年", "Junky", "鏡音リン", "メランコリック","伝説入り"]   
-},
-{     
-  sm: "sm1639267",     
-  tags: ["2007年", "シンP", "KAITO","MEIKO","初音ミク", "卑怯戦隊うろたんだー","伝説入り"]   
-},
-{     
-  sm: "sm42585649",     
-  tags: ["2023年", "原口沙輔", "重音テト", "人マニア","伝説入り"]   
-},
-  // ここに100曲でも1000曲でも追加していくだけ！
-];
-let allData = [], db = null;
-const PROXIES = ["https://corsproxy.io/?","https://api.codetabs.com/v1/proxy?quest=","https://thingproxy.freeboard.io/fetch/"];
+const PAGE_SIZE = 30;
+let allData = [], db = null, currentPage = 1, filteredData = [];
+const today = new Date().toLocaleDateString("ja-JP");
+const PROXIES = ["https://corsproxy.io/?", "https://api.codetabs.com/v1/proxy?quest="];
 
-// IndexedDB（掲示板が確実に動くように修正）
-const dbReq = indexedDB.open("VocaloidHitokoto2025", 1);
-dbReq.onupgradeneeded = e => e.target.result.createObjectStore("posts", {keyPath: "id", autoIncrement: true});
-dbReq.onsuccess = e => { db = e.target.result; if(location.hash === "#hitokoto") loadHitokoto(); };
+const req = indexedDB.open("VocaloidGod2025", 6);
+req.onupgradeneeded = e => {
+  db = e.target.result;
+  if (!db.objectStoreNames.contains("daily")) db.createObjectStore("daily", {keyPath: "date"});
+  if (!db.objectStoreNames.contains("hitokoto")) db.createObjectStore("hitokoto", {keyPath: "id", autoIncrement: true});
+  if (!db.objectStoreNames.contains("fav")) db.createObjectStore("fav", {keyPath: "sm"});
+};
+req.onsuccess = e => { db = e.target.result; init(); };
 
-// （getInfo / updateData / render は前回と同じで100%動く）
-
-async function getInfo(sm){
-  for(const p of PROXIES){
-    try{
-      const res = await fetch(p + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/"+sm),{signal:AbortSignal.timeout(12000)});
-      if(!res.ok) continue;
-      const txt = await res.text();
-      if(txt.includes("<error>")) continue;
-      const xml = new DOMParser().parseFromString(txt,"text/xml");
-      const g = t => xml.querySelector(t)?.textContent.trim()||"";
-      const entry = HALL_OF_FAME.find(x=>x.sm===sm);
-      return {sm,title:g("title"),uploader:g("user_nickname")||g("ch_name")||"不明",view:+g("view_counter")||0,date:g("first_retrieve")?.slice(0,10)||"??" ,tags:entry?entry.tags:[]};
-    }catch(e){}
+async function init() {
+  const cached = await getDaily(today);
+  if (cached) {
+    allData = cached.data.map((d, i) => ({ ...d, prev: cached.prev?.[i]?.view || d.view }));
+    render();
+    document.getElementById("last-update").textContent = `今日のデータ（${new Date(cached.time).toLocaleTimeString("ja-JP")}更新）`;
+  } else {
+    await updateToday();
   }
-  return {sm,title:"取得失敗",uploader:"-",view:0,date:"??",tags:[]};
+  loadHitokoto();
+  document.getElementById("darkmode").onclick = () => document.body.classList.toggle("dark");
 }
 
-async function updateData(){
-  document.getElementById("update").disabled=true;
-  document.getElementById("main").innerHTML=`<div class="loading">取得中… 0/${HALL_OF_FAME.length}</div>`;
-  allData=[];
-  for(let i=0;i<HALL_OF_FAME.length;i++){
+async function updateToday() {
+  document.getElementById("main").innerHTML = `<div class="loading">今日の最新データを取得中…（1日1回だけ）</div>`;
+  const newData = [];
+  for (let i = 0; i < HALL_OF_FAME.length; i++) {
     const info = await getInfo(HALL_OF_FAME[i].sm);
-    allData.push(info);
-    document.querySelector(".loading").innerHTML=`取得中…<br><b>${i+1}/${HALL_OF_FAME.length}</b><br>${info.title}`;
+    newData.push(info);
+    document.querySelector(".loading").innerHTML = `取得中… ${i + 1}/${HALL_OF_FAME.length}<br>${info.title}`;
   }
-  localStorage.setItem("vdb2025_final",JSON.stringify({data:allData,time:Date.now()}));
-  document.getElementById("last-update").textContent="最終更新: "+new Date().toLocaleString("ja-JP");
-  document.getElementById("update").disabled=false;
+  const yesterday = getYesterday();
+  const prev = await getDaily(yesterday);
+  allData = newData.map((d, i) => ({ ...d, prev: prev?.data?.[i]?.view || d.view }));
+  await putDaily({ date: today, data: newData, prev: prev?.data, time: Date.now() });
+  document.getElementById("last-update").textContent = "最新更新完了！ " + new Date().toLocaleTimeString("ja-JP");
+  currentPage = 1;
   render();
 }
 
-function render(){
-  document.querySelectorAll("nav a").forEach(a=>a.classList.remove("active"));
-  const current = location.hash || "#home";
-  document.querySelector(`nav a[href="${current}"]`)?.classList.add("active");
-
-  // 掲示板ページに来たらテーブルは一切表示しない
-  if(current === "#hitokoto"){
-    document.getElementById("main").innerHTML = "";
-    document.getElementById("hitokoto-section").style.display = "block";
-    loadHitokoto();
-    return;
-  } else {
-    document.getElementById("hitokoto-section").style.display = "none";
-  }
-
-  const q = document.getElementById("search").value.toLowerCase();
-  const list = allData.filter(v=>v.title.toLowerCase().includes(q)||v.uploader.toLowerCase().includes(q)||v.tags.some(t=>t.toLowerCase().includes(q)));
-
-  let html = `<div style="text-align:center;margin:1rem;color:#555;">表示中：${list.length}曲 / 全${allData.length}曲</div>`;
-
-  if(current==="#list"){
-    list.forEach(v=>html+=`<div class="card"><h3><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></h3><p>${v.uploader} • ${v.date} • ${v.view.toLocaleString()}回<br>${v.tags.map(t=>`<span class="tag" onclick="document.getElementById('search').value='${t}';render()">${t}</span>`).join("")}</p></div>`);
-  }else if(current==="#p"){
-    const pcount = {};
-    list.forEach(v=>pcount[v.uploader]=(pcount[v.uploader]||0)+1);
-    const ranked = Object.entries(pcount).map(([n,c])=>({name:n,cnt:c})).sort((a,b)=>b.cnt-a.cnt);
-    html+="<table><thead><tr><th>#</th><th>P名</th><th>殿堂入り数</th></tr></thead><tbody>"+ranked.map((v,i)=>`<tr><td>${i+1}</td><td>${v.name}</td><td>${v.cnt}曲</td></tr>`).join("")+"</tbody></table>";
-  }else{
-    html+="<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
-    list.sort((a,b)=>b.view-a.view).forEach((v,i)=>html+=`<tr><td style="text-align:center;font-weight:bold;color:#00bfff;">${i+1}位</td><td><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td><td>${v.uploader}</td><td style="text-align:right;">${v.view.toLocaleString()}回</td></tr>`);
-    html+="</tbody></table>";
-  }
-  document.getElementById("main").innerHTML=html;
+function getYesterday() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toLocaleDateString("ja-JP");
 }
 
-function loadHitokoto(){
-  const tx = db.transaction("posts","readonly").objectStore("posts").getAll();
-  tx.onsuccess = () => {
-    const posts = tx.result.reverse();
-    document.getElementById("hitokoto-list").innerHTML = posts.length ? posts.map((p,i)=>`<div class="hitokoto-item"><span class="hitokoto-no">${i+1}</span><span class="hitokoto-name">${p.name||"名無し"}</span><span class="hitokoto-comment">${p.comment}</span><span class="hitokoto-date">${p.date}</span></div>`).join("") : "<p style='text-align:center;color:#999;padding:3rem;'>まだ書き込みがありません！最初の一言をどうぞ！</p>";
+async function getDaily(date) {
+  return new Promise(r => {
+    const t = db.transaction("daily");
+    t.objectStore("daily").get(date).onsuccess = e => r(e.target.result);
+  });
+}
+async function putDaily(obj) {
+  return new Promise(r => {
+    const t = db.transaction("daily", "readwrite");
+    t.objectStore("daily").put(obj);
+    t.oncomplete = r;
+  });
+}
+
+async function getInfo(sm) {
+  for (const p of PROXIES) {
+    try {
+      const res = await fetch(p + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/" + sm), { signal: AbortSignal.timeout(12000) });
+      if (!res.ok) continue;
+      const txt = await res.text();
+      if (txt.includes("<error>")) continue;
+      const xml = new DOMParser().parseFromString(txt, "text/xml");
+      const g = t => xml.querySelector(t)?.textContent.trim() || "";
+      const entry = HALL_OF_FAME.find(x => x.sm === sm);
+      return {
+        sm,
+        title: g("title") || "(不明)",
+        uploader: g("user_nickname") || g("ch_name") || "不明",
+        view: +g("view_counter") || 0,
+        date: g("first_retrieve")?.slice(0, 10) || "??",
+        tags: entry?.tags || []
+      };
+    } catch {}
+  }
+  return { sm, title: "取得失敗", uploader: "-", view: 0, date: "??", tags: [] };
+}
+
+function render() {
+  document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  const hash = location.hash.slice(1) || "home";
+  document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active");
+
+  const q = document.getElementById("search").value.toLowerCase();
+  filteredData = allData.filter(v =>
+    v.title.toLowerCase().includes(q) ||
+    v.uploader.toLowerCase().includes(q) ||
+    v.tags.some(t => t.toLowerCase().includes(q))
+  );
+
+  if (hash === "fav") {
+    getAllFav().then(favs => {
+      filteredData = filteredData.filter(v => favs.some(f => f.sm === v.sm));
+      renderTable();
+    });
+    return;
+  }
+  renderTable();
+}
+
+async function renderTable() {
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  currentPage = Math.min(currentPage, totalPages || 1);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filteredData.slice(start, start + PAGE_SIZE);
+
+  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filteredData.length} 曲中 ${start + 1}〜${Math.min(start + PAGE_SIZE, filteredData.length)} 件表示</div>`;
+
+  const hash = location.hash.slice(1) || "home";
+
+  if (hash === "list" || hash === "fav") {
+    pageData.forEach(v => {
+      const diff = v.view - v.prev;
+      const isFav = localStorage.getItem("fav_" + v.sm);
+      html += `<div style="background:white;padding:1.5rem;margin:1rem 0;border-radius:12px;box-shadow:0 4px 15px rgba(0,191,255,.2);">
+        <span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+        <strong><a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></strong><br>
+        ${v.uploader} • ${v.date} • ${v.view.toLocaleString()}回
+        ${diff !== 0 ? `<span class="diff ${diff > 0 ? 'up' : 'down'}">(${diff > 0 ? '+' + diff : diff})</span>` : ''}
+        <div style="margin-top:.5rem;">${v.tags.map(t => `<span class="tag" onclick="document.getElementById('search').value='${t}';currentPage=1;render()">${t}</span>`).join(" ")}</div>
+      </div>`;
+    });
+  } else if (hash === "p") {
+    const pcount = {};
+    filteredData.forEach(v => pcount[v.uploader] = (pcount[v.uploader] || 0) + 1);
+    const ranked = Object.entries(pcount).map(([n, c]) => ({ name: n, cnt: c })).sort((a, b) => b.cnt - a.cnt);
+    html += "<table><thead><tr><th>#</th><th>P名</th><th>殿堂入り数</th></tr></thead><tbody>";
+    ranked.forEach((v, i) => html += `<tr><td>${i + 1}</td><td>${v.name}</td><td>${v.cnt}曲</td></tr>`);
+    html += "</tbody></table>";
+  } else {
+    html += "<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
+    filteredData.sort((a, b) => b.view - a.view);
+    pageData.forEach((v, i) => {
+      const rank = start + i + 1;
+      const diff = v.view - v.prev;
+      const isFav = localStorage.getItem("fav_" + v.sm);
+      html += `<tr>
+        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}位</td>
+        <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+        <a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a>
+        ${diff !== 0 ? ` <span class="diff ${diff > 0 ? 'up' : 'down'}">(${diff > 0 ? '+' + diff : diff})</span>` : ""}</td>
+        <td>${v.uploader}</td>
+        <td style="text-align:right;">${v.view.toLocaleString()}回</td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+  }
+
+  document.getElementById("main").innerHTML = html;
+  renderPagination(totalPages);
+  document.getElementById("hitokoto-section").style.display = hash === "hitokoto" ? "block" : "none";
+  if (hash === "hitokoto") loadHitokoto();
+}
+
+function renderPagination(total) {
+  if (total <= 1) { document.getElementById("pagination").innerHTML = ""; return; }
+  let html = "";
+  if (currentPage > 1) html += `<button onclick="currentPage--;render()">‹ 前へ</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= currentPage - 2 && i <= currentPage + 2))
+      html += `<button class="${i === currentPage ? 'active' : ''}" onclick="currentPage=${i};render()">${i}</button>`;
+    else if (i === currentPage - 3 || i === currentPage + 3) html += `<span>...</span>`;
+  }
+  if (currentPage < total) html += `<button onclick="currentPage++;render()">次へ ›</button>`;
+  document.getElementById("pagination").innerHTML = html;
+}
+
+function toggleFav(sm) {
+  if (localStorage.getItem("fav_" + sm)) localStorage.removeItem("fav_" + sm);
+  else localStorage.setItem("fav_" + sm, "1");
+  render();
+}
+
+async function getAllFav() {
+  const favs = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith("fav_")) favs.push({ sm: key.slice(4) });
+  }
+  return favs;
+}
+
+function loadHitokoto() {
+  const tx = db.transaction("hitokoto");
+  tx.objectStore("hitokoto").getAll().onsuccess = e => {
+    const posts = e.target.result.reverse();
+    document.getElementById("hitokoto-list").innerHTML = posts.length ? posts.map((p, i) => `
+      <div class="hitokoto-item">
+        <span class="hitokoto-no">${i + 1}</span>
+        <span class="hitokoto-name">${p.name || "名無し"}</span>
+        <span class="hitokoto-comment">${p.comment}</span>
+        <span class="hitokoto-date">${p.date}</span>
+      </div>`).join("") : "<p style='text-align:center;color:#999;padding:3rem;'>まだ書き込みがありません！最初の一言をどうぞ！</p>";
   };
 }
 
 document.getElementById("hitokoto-submit").onclick = () => {
   const name = document.getElementById("hitokoto-name").value.trim() || "名無し";
   const comment = document.getElementById("hitokoto-comment").value.trim();
-  if(!comment){ alert("一言を書いてね！"); return; }
-  const tx = db.transaction("posts","readwrite");
-  tx.objectStore("posts").add({name, comment, date:new Date().toLocaleString("ja-JP")});
-  tx.oncomplete = () => { document.getElementById("hitokoto-comment").value=""; loadHitokoto(); };
+  if (!comment) return alert("一言を書いてね！");
+  const tx = db.transaction("hitokoto", "readwrite");
+  tx.objectStore("hitokoto").add({ name, comment, date: new Date().toLocaleString("ja-JP") });
+  tx.oncomplete = () => {
+    document.getElementById("hitokoto-comment").value = "";
+    loadHitokoto();
+  };
 };
 
-// 起動
-const cache = localStorage.getItem("vdb2025_final");
-if(cache){
-  const obj = JSON.parse(cache);
-  allData = obj.data;
-  document.getElementById("last-update").textContent = "最終更新: "+new Date(obj.time).toLocaleString("ja-JP");
-  render();
-} else {
-  updateData();
-}
-
-document.getElementById("update").onclick = updateData;
-document.getElementById("search").oninput = render;
-window.onhashchange = render;
+document.getElementById("update").onclick = updateToday;
+document.getElementById("search").oninput = () => { currentPage = 1; render(); };
+window.onhashchange = () => { currentPage = 1; render(); };
 </script>
-</body></html>
+</body>
+</html>
