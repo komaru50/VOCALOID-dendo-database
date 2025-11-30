@@ -88,28 +88,26 @@ const today = new Date().toLocaleDateString("ja-JP");
 // 解決策3: GitHub PagesのJSONを直接読み込む方式に変更
 // ニコニコ直接スクレイプは廃止（CORS/レートリミット問題回避）
 async function updateToday() {
-  document.getElementById("main").innerHTML = "<div class='loading'>最新データを取得中…（5秒くらい）</div>";
+  document.getElementById("main").innerHTML = "<div class='loading'>最新データを取得中…（0.5秒）</div>";
   try {
-    // Vercelホスティングを考慮: /api/latest.json としてデプロイ想定
-    // GitHub Pagesの場合: https://YOUR-USERNAME.github.io/vocalo-hof-db/latest.json
-    // ここではVercel用に相対パス（/api/latest.json）を使用。実際のデプロイで調整
-    const res = await fetch("https://vocaloid-legend-db.deno.dev/latest.json?t=" + Date.now());
-    const json = await res.ok ? await res.json() : null;
-    
-    if (json && json.data && json.data.length > 100) {
-      allData = json.data;
-      await putDaily({ date: today, data: allData, time: Date.now() });
-      document.getElementById("last-update").textContent = `最終更新：${new Date(json.time).toLocaleString("ja-JP")}（自動）`;
-      render();
-    } else {
-      throw new Error("データ形式エラー");
-    }
-  } catch(e) {
-    // フォールバック: GitHub Pages URLを指定（ユーザー名を置き換え）
-    // 実際の使用時は const GITHUB_URL = "https://YOUR-USERNAME.github.io/vocalo-hof-db/latest.json";
-    // const res = await fetch(`${GITHUB_URL}?t=${Date.now()}`);
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>取得失敗…<br>GitHub Actionsの更新を確認するか、手動でlatest.jsonをアップロードしてください</div>";
-    console.error(e);
+    const res = await fetch("https://vocaloid-legend-db.deno.dev/latest-flat?t=" + Date.now());
+    const latestFlat = await res.json();
+
+    const viewMap = {};
+    latestFlat.forEach(item => {
+      viewMap[item.id] = item.views;
+    });
+
+    allData = allSongs.map(song => ({
+      ...song,
+      view: viewMap[song.sm] || song.view || 0
+    }));
+
+    await putDaily({ date: today, data: allData, time: Date.now() });
+    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（自動）`;
+    render();
+  } catch (e) {
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>取得失敗…<br>しばらく待ってから再試行してください</div>";
   }
 }
 
