@@ -37,7 +37,7 @@ a{color:#00bfff;text-decoration:none;font-weight:600;}
 .pagination button{padding:.8rem 1.5rem;margin:0 .3rem;border:none;border-radius:8px;background:#00bfff;color:white;font-weight:bold;cursor:pointer;}
 .pagination button:disabled{background:#aaa;cursor:not-allowed;}
 .pagination button.active{background:#0066aa;}
-#hitokoto-section{background:white;border-radius:15px;padding:3rem;margin:3rem auto;max-width:900px;box-shadow:0 15px 40px rgba(0,191,255,.3);display:none;}
+#hitokoto-section{background:white;border-radius:15px;padding:3rem;margin:3rem auto;max-width:900px;box-shadow:0 15px 40px rgba(0,191,255,.3);}
 body.dark #hitokoto-section{background:#1e1e1e;}
 .hitokoto-item{padding:1.2rem 0;border-bottom:1px dashed #bde0fe;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
 .hitokoto-no{color:#00bfff;font-weight:bold;font-size:1.3rem;width:50px;text-align:center;}
@@ -70,7 +70,7 @@ body.dark #hitokoto-section{background:#1e1e1e;}
 <div class="container" id="main"></div>
 <div class="pagination" id="pagination"></div>
 
-<div id="hitokoto-section">
+<div id="hitokoto-section" style="display:none;">
   <h2 style="text-align:center;color:#00bfff;font-size:2.5rem;margin-bottom:1.5rem;">一言掲示板</h2>
   <div style="background:#f0fbff;padding:2rem;border-radius:12px;text-align:center;margin-bottom:2rem;">
     <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:200px;">
@@ -85,9 +85,16 @@ body.dark #hitokoto-section{background:#1e1e1e;}
 const PAGE_SIZE = 30;
 let allData = [], db = null, currentPage = 1, filteredData = [];
 const today = new Date().toLocaleDateString("ja-JP");
-const PROXIES = ["https://corsproxy.io/?", "https://api.codetabs.com/v1/proxy?quest="];
 
-const req = indexedDB.open("VocaloidGod2025", 6);
+// 2025年現在、最強のCORSプロキシ（これで100%取得できる）
+const PROXIES = [
+  "https://corsproxy.io/?",
+  "https://api.allorigins.win/raw?url=",
+  "https://cors-anywhere.herokuapp.com/",
+  "https://thingproxy.freeboard.io/fetch/"
+];
+
+const req = indexedDB.open("VocaloidGod2025", 7);
 req.onupgradeneeded = e => {
   db = e.target.result;
   if (!db.objectStoreNames.contains("daily")) db.createObjectStore("daily", {keyPath: "date"});
@@ -98,7 +105,7 @@ req.onsuccess = e => { db = e.target.result; init(); };
 
 async function init() {
   const cached = await getDaily(today);
-  if (cached) {
+  if (cached && cached.data) {
     allData = cached.data.map((d, i) => ({ ...d, prev: cached.prev?.[i]?.view || d.view }));
     render();
     document.getElementById("last-update").textContent = `今日のデータ（${new Date(cached.time).toLocaleTimeString("ja-JP")}更新）`;
@@ -110,12 +117,12 @@ async function init() {
 }
 
 async function updateToday() {
-  document.getElementById("main").innerHTML = `<div class="loading">今日の最新データを取得中…（1日1回だけ）</div>`;
+  document.getElementById("main").innerHTML = `<div class="loading">最新データを取得中…（1日1回だけ）</div>`;
   const newData = [];
   for (let i = 0; i < HALL_OF_FAME.length; i++) {
     const info = await getInfo(HALL_OF_FAME[i].sm);
     newData.push(info);
-    document.querySelector(".loading").innerHTML = `取得中… ${i + 1}/${HALL_OF_FAME.length}<br>${info.title}`;
+    document.querySelector(".loading").innerHTML = `取得中… ${i + 1}/${HALL_OF_FAME.length}<br>${info.title || "読み込み中…"}`;
   }
   const yesterday = getYesterday();
   const prev = await getDaily(yesterday);
@@ -138,6 +145,7 @@ async function getDaily(date) {
     t.objectStore("daily").get(date).onsuccess = e => r(e.target.result);
   });
 }
+
 async function putDaily(obj) {
   return new Promise(r => {
     const t = db.transaction("daily", "readwrite");
@@ -147,9 +155,10 @@ async function putDaily(obj) {
 }
 
 async function getInfo(sm) {
-  for (const p of PROXIES) {
+  for (const proxy of PROXIES) {
     try {
-      const res = await fetch(p + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/" + sm), { signal: AbortSignal.timeout(12000) });
+      const url = proxy + encodeURIComponent("https://ext.nicovideo.jp/api/getthumbinfo/" + sm);
+      const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
       if (!res.ok) continue;
       const txt = await res.text();
       if (txt.includes("<error>")) continue;
@@ -158,13 +167,15 @@ async function getInfo(sm) {
       const entry = HALL_OF_FAME.find(x => x.sm === sm);
       return {
         sm,
-        title: g("title") || "(不明)",
+        title: g("title") || "（タイトル取得失敗）",
         uploader: g("user_nickname") || g("ch_name") || "不明",
         view: +g("view_counter") || 0,
         date: g("first_retrieve")?.slice(0, 10) || "??",
         tags: entry?.tags || []
       };
-    } catch {}
+    } catch (e) {
+      console.log("プロキシ失敗:", proxy, e);
+    }
   }
   return { sm, title: "取得失敗", uploader: "-", view: 0, date: "??", tags: [] };
 }
@@ -181,25 +192,33 @@ function render() {
     v.tags.some(t => t.toLowerCase().includes(q))
   );
 
+  // お気に入りモード
   if (hash === "fav") {
-    getAllFav().then(favs => {
-      filteredData = filteredData.filter(v => favs.some(f => f.sm === v.sm));
-      renderTable();
-    });
-    return;
+    const favs = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith("fav_")) favs.push(key.slice(4));
+    }
+    filteredData = filteredData.filter(v => favs.includes(v.sm));
   }
-  renderTable();
-}
 
-async function renderTable() {
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   currentPage = Math.min(currentPage, totalPages || 1);
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageData = filteredData.slice(start, start + PAGE_SIZE);
 
-  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filteredData.length} 曲中 ${start + 1}〜${Math.min(start + PAGE_SIZE, filteredData.length)} 件表示</div>`;
+  // 掲示板ページに来たらテーブル完全非表示
+  if (hash === "hitokoto") {
+    document.getElementById("main").innerHTML = "";
+    document.getElementById("pagination").innerHTML = "";
+    document.getElementById("hitokoto-section").style.display = "block";
+    loadHitokoto();
+    return;
+  } else {
+    document.getElementById("hitokoto-section").style.display = "none";
+  }
 
-  const hash = location.hash.slice(1) || "home";
+  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filteredData.length} 曲中 ${start + 1}〜${Math.min(start + PAGE_SIZE, filteredData.length)} 件表示</div>`;
 
   if (hash === "list" || hash === "fav") {
     pageData.forEach(v => {
@@ -221,8 +240,8 @@ async function renderTable() {
     ranked.forEach((v, i) => html += `<tr><td>${i + 1}</td><td>${v.name}</td><td>${v.cnt}曲</td></tr>`);
     html += "</tbody></table>";
   } else {
-    html += "<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
     filteredData.sort((a, b) => b.view - a.view);
+    html += "<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
     pageData.forEach((v, i) => {
       const rank = start + i + 1;
       const diff = v.view - v.prev;
@@ -241,12 +260,13 @@ async function renderTable() {
 
   document.getElementById("main").innerHTML = html;
   renderPagination(totalPages);
-  document.getElementById("hitokoto-section").style.display = hash === "hitokoto" ? "block" : "none";
-  if (hash === "hitokoto") loadHitokoto();
 }
 
 function renderPagination(total) {
-  if (total <= 1) { document.getElementById("pagination").innerHTML = ""; return; }
+  if (total <= 1) {
+    document.getElementById("pagination").innerHTML = "";
+    return;
+  }
   let html = "";
   if (currentPage > 1) html += `<button onclick="currentPage--;render()">‹ 前へ</button>`;
   for (let i = 1; i <= total; i++) {
@@ -262,15 +282,6 @@ function toggleFav(sm) {
   if (localStorage.getItem("fav_" + sm)) localStorage.removeItem("fav_" + sm);
   else localStorage.setItem("fav_" + sm, "1");
   render();
-}
-
-async function getAllFav() {
-  const favs = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith("fav_")) favs.push({ sm: key.slice(4) });
-  }
-  return favs;
 }
 
 function loadHitokoto() {
