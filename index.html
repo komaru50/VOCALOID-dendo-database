@@ -45,49 +45,42 @@ body.dark .song-page{background:#1e1e1e;}
 <body>
 
 <header>
-  <h1>ボカロ殿堂入りデータベース</h1>
-  <div class="last-update" id="last-update">読み込み中…</div>
-  <div id="darkmode">Night</div>
+<h1>ボカロ殿堂入りデータベース</h1>
+<div class="last-update" id="last-update">読み込み中…</div>
+<div id="darkmode">Night</div>
 </header>
 
 <nav>
-  <a href="#home" class="active">ランキング</a>
-  <a href="#list">全曲一覧</a>
-  <a href="#uploader">P別ランキング</a>
-  <a href="#fav">お気に入り</a>
-  <a href="#deleted">転載・削除曲</a>
-  <a href="#hitokoto">掲示板</a>
+<a href="#home" class="active">ランキング</a>
+<a href="#list">全曲一覧</a>
+<a href="#uploader">P別ランキング</a>
+<a href="#fav">お気に入り</a>
+<a href="#deleted">転載・削除曲</a>
+<a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
-  <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
+<input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
 </div>
 
 <div class="container" id="main"></div>
 <div class="pagination" id="pagination"></div>
 
-<div id="hitokoto-section">
-  <h2 style="text-align:center;color:#00bfff;margin-bottom:2rem;">一言掲示板</h2>
-  <div style="background:#f0fbff;padding:2rem;border-radius:12px;text-align:center;margin-bottom:2rem;">
-    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:200px;">
-    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ" maxlength="100" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:320px;">
-    <button id="hitokoto-submit" style="padding:.8rem 2rem;background:#00bfff;color:white;border:none;border-radius:50px;">書き込む</button>
-  </div>
-  <div id="hitokoto-list"></div>
-</div>
-
 <script>
 // ←←←←←←←←←← ここだけ自分のURLに！！！ ←←←←←←←←←←
 const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbz1youYaIV3-B9v3SzUA_K_opQ-6tHOAxfOU9KZuC0ulgWQaZKrVzEaHXR6vnhoiB4s/exec";
-const DELETED_JSON_URL = SPREADSHEET_JSON_URL + "?type=deleted";
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
 const PAGE_SIZE = 30;
 
 async function loadData() {
   document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
   try {
-    const res = await fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now());
-    allData = await res.json();
+    const [res1, res2] = await Promise.all([
+      fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now()),
+      fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now())
+    ]);
+    allData = await res1.json();
+    deletedData = await res2.json();
     document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}`;
     render();
   } catch(e) {
@@ -95,22 +88,11 @@ async function loadData() {
   }
 }
 
-async function loadDeletedData() {
-  try {
-    const res = await fetch(DELETED_JSON_URL + "?t=" + Date.now());
-    deletedData = await res.json();
-  } catch(e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>削除曲読み込み失敗…リロードしてください</div>";
-  }
-}
-
-loadData();
-loadDeletedData();
-
 function render() {
   const hash = location.hash.slice(1) || "home";
   const songId = hash.startsWith("song/") ? hash.slice(5) : null;
 
+  // アクティブなナビ更新
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
   if (songId) {
     document.querySelector(`nav a[href="#home"]`).classList.add("active");
@@ -118,7 +100,7 @@ function render() {
     document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active");
   }
 
-  // 楽曲別ページ
+  // 楽曲個別ページ
   if (songId) {
     const song = allData.find(s => s.sm === songId);
     if (!song) {
@@ -144,13 +126,50 @@ function render() {
         <div style="text-align:center;margin-top:3rem;">
           <a href="#home" style="color:#00bfff;font-size:1.2rem;">← ランキングに戻る</a>
         </div>
-      </div>
-    `;
+      </div>`;
     document.getElementById("pagination").innerHTML = "";
     return;
   }
 
-  // タグ別ページ
+  // 転載・削除曲ページ
+  if (hash === "deleted") {
+    let filtered = deletedData.filter(v => {
+      const q = (document.getElementById("search").value||"").toLowerCase();
+      return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
+    });
+
+    const total = filtered.length;
+    const pages = Math.ceil(total / PAGE_SIZE);
+    currentPage = Math.min(currentPage, pages || 1);
+    const start = (currentPage-1) * PAGE_SIZE;
+    const pageData = filtered.slice(start, start + PAGE_SIZE);
+
+    let html = `<div style="text-align:center;margin:1rem;color:#c33;font-weight:bold;">転載・削除された殿堂入り曲（最終記録）</div>`;
+    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, total)} 件</div>`;
+    html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>最終再生数</th><th>タグ</th></tr></thead><tbody>`;
+    pageData.forEach((v, i) => {
+      const rank = start + i + 1;
+      html += `<tr>
+        <td style="text-align:center;font-weight:bold;color:#c33;">${rank}</td>
+        <td>${v.title} <span style="color:#aaa;font-size:0.8em;">(削除済)</span></td>
+        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+        <td style="text-align:right;color:#c33;">${Number(v.view).toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+
+    let pagi = "";
+    for (let i=1; i<=pages; i++) {
+      pagi += `<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
+    }
+    document.getElementById("pagination").innerHTML = pagi;
+    document.getElementById("main").innerHTML = html;
+    document.title = "転載・削除曲 - ボカロ殿堂入りDB";
+    return;
+  }
+
+  // タグ別
   if (hash.startsWith("tag/")) {
     currentTag = decodeURIComponent(hash.slice(4));
     document.title = `${currentTag} - ボカロ殿堂入りDB`;
@@ -189,8 +208,10 @@ function render() {
     return;
   }
 
-  // ランキングソート
-  if (hash === "home" || hash === "") filtered.sort((a,b) => b.view - a.view);
+  // ランキングソート（#home と #list は同じ挙動）
+  if (hash === "home" || hash === "list" || hash === "") {
+    filtered.sort((a,b) => b.view - a.view);
+  }
 
   const total = filtered.length;
   const pages = Math.ceil(total / PAGE_SIZE);
@@ -201,7 +222,7 @@ function render() {
   let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, total)} 件${currentTag?`（タグ: ${currentTag}）`:""}</div>`;
   html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>タグ</th></tr></thead><tbody>`;
   pageData.forEach((v, i) => {
-    const rank = (hash === "home" || hash === "") ? filtered.indexOf(v) + 1 : start + i + 1;
+    const rank = (hash === "home" || hash === "" || hash === "list") ? filtered.indexOf(v) + 1 : start + i + 1;
     const isFav = localStorage.getItem("fav_" + v.sm);
     html += `<tr>
       <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
@@ -214,13 +235,11 @@ function render() {
   });
   html += `</tbody></table>`;
 
-  // ページネーション
   let pagi = "";
   for (let i=1; i<=pages; i++) {
     pagi += `<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
   }
   document.getElementById("pagination").innerHTML = pagi;
-
   document.getElementById("main").innerHTML = html;
 }
 
