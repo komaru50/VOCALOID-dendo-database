@@ -3,56 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <title>ボカロ殿堂入りデータベース</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-body {font-family:'Noto Sans JP',sans-serif;background:#f5fbff;color:#222;margin:0;padding:0;}
-body.dark {background:#121212;color:#eee;}
-header {background:linear-gradient(135deg,#00bfff,#0088cc);color:white;padding:2rem;text-align:center;position:relative;}
-h1 {margin:0;font-size:2.5rem;text-shadow:0 2px 10px rgba(0,0,0,.3);}
-nav {background:#008fd5;padding:1rem;text-align:center;}
-nav a {color:white;margin:0 .8rem;padding:.7rem 1.4rem;border-radius:50px;text-decoration:none;font-weight:bold;transition:.3s;}
-nav a:hover, nav a.active {background:#0066aa;transform:scale(1.05);}
-.container {max-width:1400px;margin:2rem auto;padding:0 1rem;}
-.search-box {text-align:center;margin:2rem 0;}
-.search-box input {padding:1rem 2rem;font-size:1.2rem;width:600px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;transition:.3s;}
-.search-box input:focus {border-color:#0066aa;box-shadow:0 0 20px rgba(0,191,255,.5);}
-table {width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 10px 30px rgba(0,191,255,.2);margin-bottom:2rem;}
-body.dark table {background:#1e1e1e;box-shadow:0 10px 30px rgba(0,0,0,.5);}
-th {background:#00bfff;color:white;padding:1.3rem;font-size:1.1rem;}
-td {padding:1rem;border-bottom:1px solid #ddd;text-align:left;}
-tr:hover {background:#e6f7ff;}
-body.dark tr:hover {background:#2a2a2a;}
-a {color:#00bfff;text-decoration:none;font-weight:600;}
-a:hover {text-decoration:underline;}
-.tag {display:inline-block;background:#00bfff;color:white;padding:.4rem .9rem;border-radius:30px;margin:0.3rem;font-size:0.9rem;}
-.tag.deleted {background:#ff4444;}
-.fav {cursor:pointer;font-size:1.5rem;margin-right:.6rem;transition:.3s;}
-.fav.on {color:#ff4444;transform:scale(1.2);}
-.loading {text-align:center;padding:5rem;font-size:1.6rem;color:#0066aa;}
-.pagination {text-align:center;margin:3rem 0;}
-.pagination button {padding:.8rem 1.4rem;margin:0 .3rem;border:none;border-radius:50px;background:#00bfff;color:white;cursor:pointer;font-weight:bold;transition:.3s;}
-.pagination button:hover {background:#0066aa;transform:scale(1.05);}
-.pagination button.active {background:#0066aa;}
-#darkmode {position:absolute;top:20px;left:20px;background:rgba(0,0,0,.5);color:white;padding:.8rem 1.3rem;border-radius:50%;cursor:pointer;font-weight:bold;}
-.update-btn {position:absolute;top:20px;right:20px;background:#ff4444;color:white;border:none;padding:.8rem 1.6rem;border-radius:50px;cursor:pointer;font-weight:bold;}
-.last-update {position:absolute;top:70px;right:20px;color:rgba(255,255,255,.9);font-size:0.9rem;background:rgba(0,0,0,.3);padding:.4rem .8rem;border-radius:8px;}
-#hitokoto-section {background:white;border-radius:15px;padding:3rem;margin:3rem auto;max-width:1000px;box-shadow:0 10px 30px rgba(0,191,255,.2);}
-body.dark #hitokoto-section {background:#1e1e1e;}
-.hitokoto-item {padding:1.2rem 0;border-bottom:1px dashed #bde0fe;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
-.hitokoto-no {color:#00bfff;font-weight:bold;width:50px;text-align:center;font-size:1.2rem;}
-.hitokoto-name {color:#00bfff;font-weight:bold;}
-.hitokoto-comment {flex:1;font-size:1.1rem;}
-.hitokoto-date {color:#888;font-size:0.9rem;}
+body{font-family:'Noto Sans JP',sans-serif;background:#f5fbff;color:#222;margin:0;}
+body.dark{background:#121212;color:#eee;}
+header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
+h1{margin:0;font-size:2.3rem;}
+nav{background:#008fd5;padding:1rem;text-align:center;}
+nav a{color:white;margin:0 1rem;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:bold;}
+nav a.active,nav a:hover{background:#0066aa;}
+.container{max-width:1300px;margin:2rem auto;padding:0 1rem;}
+.search-box{text-align:center;margin:2rem 0;}
+.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
+table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 8px 30px rgba(0,191,255,.2);margin-bottom:2rem;}
+body.dark table{background:#1e1e1e;}
+th{background:#00bfff;color:white;padding:1.2rem;}
+td{padding:1rem;border-bottom:1px solid #ddd;}
+tr:hover{background:#f0fbff;}
+body.dark tr:hover{background:#2a2a2a;}
+a{color:#00bfff;text-decoration:none;font-weight:600;}
+.tag{display:inline-block;background:#00aaff;color:white;padding:.4rem .9rem;border-radius:30px;margin:0.3rem;font-size:0.9rem;cursor:pointer;transition:.3s;}
+.tag:hover{background:#0088cc;transform:scale(1.1);}
+.last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,.9);font-size:0.9rem;}
+#darkmode{position:absolute;top:20px;left:20px;background:#333;color:white;padding:.8rem 1.2rem;border-radius:50%;cursor:pointer;font-size:0.9rem;}
+.fav{cursor:pointer;font-size:1.5rem;margin-right:8px;transition:.3s;}
+.fav.on{color:#ff4444;transform:scale(1.2);}
+.loading{text-align:center;padding:4rem;font-size:1.6rem;color:#0066aa;}
+.pagination{text-align:center;margin:2rem 0;}
+.pagination button{padding:.7rem 1.3rem;margin:0 .3rem;border:none;border-radius:8px;background:#00bfff;color:white;cursor:pointer;}
+.pagination button.active{background:#0066aa;}
+.song-page{max-width:900px;margin:3rem auto;background:white;padding:3rem;border-radius:20px;box-shadow:0 15px 40px rgba(0,191,255,.3);}
+body.dark .song-page{background:#1e1e1e;}
+.embed-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:15px;margin:2rem 0;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.embed-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.info-table{width:100%;margin-top:1rem;}
+.info-table td:first-child{font-weight:bold;color:#00bfff;width:140px;}
+.p-ranking td:nth-child(2){text-align:right;font-weight:bold;}
+.deleted-page h2 {color:#ff4444;}
+.deleted-page table th {background:#ff4444;}
+.deleted-page tr:hover {background:#ffeeee;}
+body.dark .deleted-page table {background:#1f1f1f;}
+body.dark .deleted-page tr:hover {background:#333;}
 </style>
 </head>
 <body>
 
 <header>
   <h1>ボカロ殿堂入りデータベース</h1>
-  <button class="update-btn" id="update">今日のデータを更新</button>
   <div class="last-update" id="last-update">読み込み中…</div>
-  <div id="darkmode" title="ダークモード切替">Night</div>
+  <div id="darkmode" title="ダークモード">Night</div>
 </header>
 
 <nav>
@@ -61,217 +61,147 @@ body.dark #hitokoto-section {background:#1e1e1e;}
   <a href="#uploader">P別ランキング</a>
   <a href="#fav">お気に入り</a>
   <a href="#deleted">転載・削除曲</a>
-  <a href="#hitokoto">一言掲示板</a>
+  <a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
   <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
 </div>
 
-<div class="container" id="main">
-  <div class="loading">データ読み込み中…</div>
-</div>
-
+<div class="container" id="main"></div>
 <div class="pagination" id="pagination"></div>
 
-<div id="hitokoto-section" style="display:none;">
+<div id="hitokoto-section">
   <h2 style="text-align:center;color:#00bfff;margin-bottom:2rem;">一言掲示板</h2>
-  <div style="background:#f0fbff;padding:2rem;border-radius:15px;text-align:center;margin-bottom:2rem;">
-    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20" style="padding:.9rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:220px;">
-    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ（100文字まで）" maxlength="100" style="padding:.9rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:400px;">
-    <button id="hitokoto-submit" style="padding:.9rem 2.2rem;background:#00bfff;color:white;border:none;border-radius:50px;font-weight:bold;">書き込む</button>
+  <div style="background:#f0fbff;padding:2rem;border-radius:12px;text-align:center;margin-bottom:2rem;">
+    <input type="text" id="hitokoto-name" placeholder="名前（省略可）" maxlength="20" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:200px;">
+    <input type="text" id="hitokoto-comment" placeholder="一言どうぞ" maxlength="100" style="padding:.8rem;border-radius:50px;border:2px solid #00bfff;margin:0 .5rem;width:320px;">
+    <button id="hitokoto-submit" style="padding:.8rem 2rem;background:#00bfff;color:white;border:none;border-radius:50px;">書き込む</button>
   </div>
   <div id="hitokoto-list"></div>
 </div>
 
 <script>
-// ========== 設定 ==========
-const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbz1youYaIV3-B9v3SzUA_K_opQ-6tHOAxfOU9KZuC0ulgWQaZKrVzEaHXR6vnhoiB4s/exec";  // ← ここに自分のURLを入れる！
-const DELETED_JSON_URL = SPREADSHEET_JSON_URL + "?type=deleted";
-const PAGE_SIZE = 50;
-let allData = [], deletedData = [], db = null, currentPage = 1;
+const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbz1youYaIV3-B9v3SzUA_K_opQ-6tHOAxfOU9KZuC0ulgWQaZKrVzEaHXR6vnhoiB4s/exec";
+const PAGE_SIZE = 30;
+let allData = [], deletedData = [], db = null, currentPage = 1, currentTag = null;
+const today = new Date().toLocaleDateString("ja-JP");
 
-// ========== IndexedDB ==========
-const req = indexedDB.open("VocaloidDB", 9);
+// データ読み込み
+async function loadData() {
+  document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
+  try {
+    const res = await fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now());
+    allData = await res.json();
+    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}`;
+    render();
+  } catch(e) {
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>読み込み失敗…ページをリロードしてください</div>";
+  }
+}
+
+async function loadDeletedData() {
+  try {
+    const res = await fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now());
+    deletedData = await res.json();
+  } catch (e) {
+    deletedData = [];
+  }
+}
+
+// IndexedDB
+const req = indexedDB.open("VocaloidDB", 10);
 req.onupgradeneeded = e => {
   db = e.target.result;
   if (!db.objectStoreNames.contains("daily")) db.createObjectStore("daily", {keyPath: "date"});
   if (!db.objectStoreNames.contains("hitokoto")) db.createObjectStore("hitokoto", {keyPath: "id", autoIncrement: true});
   if (!db.objectStoreNames.contains("fav")) db.createObjectStore("fav", {keyPath: "sm"});
 };
-req.onsuccess = e => { db = e.target.result; init(); };
+req.onsuccess = e => { db = e.target.result; loadData(); loadDeletedData(); loadHitokoto(); };
 
-// ========== データ読み込み ==========
-async function init() {
-  document.getElementById("darkmode").onclick = () => document.body.classList.toggle("dark");
-  document.getElementById("update").onclick = loadData;
-  document.getElementById("search").oninput = () => { currentPage = 1; render(); };
-  window.onhashchange = () => { currentPage = 1; render(); };
+// IndexedDBヘルパー
+async function getDaily(d) { return new Promise(r => db.transaction("daily").objectStore("daily").get(d).onsuccess = e => r(e.target.result)); }
+async function putDaily(o) { return new Promise(r => db.transaction("daily","readwrite").objectStore("daily").put(o).onsuccess = r); }
 
-  const today = new Date().toLocaleDateString("ja-JP");
-  const cached = await getDaily(today);
-  if (cached) {
-    allData = cached.data;
-    document.getElementById("last-update").textContent = `最終更新：${new Date(cached.time).toLocaleString("ja-JP")}`;
-  }
-  await loadDeletedData();
-  render();
-  loadHitokoto();
-}
-
-async function loadData() {
-  document.getElementById("main").innerHTML = "<div class='loading'>再生数取得中…（数秒かかります）</div>";
-  try {
-    const res = await fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now());
-    allData = await res.json();
-
-    const today = new Date().toLocaleDateString("ja-JP");
-    await putDaily({ date: today, data: allData, time: Date.now() });
-    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}（手動更新）`;
-    render();
-  } catch (e) {
-    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>読み込み失敗…リロードしてください</div>";
-  }
-}
-
-async function loadDeletedData() {
-  try {
-    const res = await fetch(DELETED_JSON_URL + "&t=" + Date.now());
-    deletedData = await res.json();
-  } catch (e) {
-    console.error("削除曲データ読み込み失敗", e);
-    deletedData = [];
-  }
-}
-
-// ========== IndexedDBヘルパー ==========
-async function getDaily(date) { return new Promise(r => db.transaction("daily").objectStore("daily").get(date).onsuccess = e => r(e.target.result)); }
-async function putDaily(obj) { return new Promise(r => db.transaction("daily","readwrite").objectStore("daily").put(obj).onsuccess = r); }
-
-// ========== お気に入り ==========
-function toggleFav(sm) {
-  const key = "fav_" + sm;
-  if (localStorage.getItem(key)) localStorage.removeItem(key);
-  else localStorage.setItem(key, "1");
-  render();
-}
-
-// ========== 一言掲示板 ==========
-function loadHitokoto() {
-  const tx = db.transaction("hitokoto");
-  tx.objectStore("hitokoto").getAll().onsuccess = e => {
-    const posts = e.target.result.reverse();
-    document.getElementById("hitokoto-list").innerHTML = posts.length ? posts.map((p, i) => `
-      <div class="hitokoto-item">
-        <span class="hitokoto-no">${posts.length - i}</span>
-        <span class="hitokoto-name">${p.name || "名無し"}</span>
-        <span class="hitokoto-comment">${p.comment}</span>
-        <span class="hitokoto-date">${p.date}</span>
-      </div>`).join("") : "<p style='text-align:center;color:#999;padding:4rem;'>まだ書き込みがありません</p>";
-  };
-}
-document.getElementById("hitokoto-submit").onclick = () => {
-  const name = document.getElementById("hitokoto-name").value.trim() || "名無し";
-  const comment = document.getElementById("hitokoto-comment").value.trim();
-  if (!comment) return;
-  db.transaction("hitokoto","readwrite").objectStore("hitokoto").add({
-    name, comment, date: new Date().toLocaleString("ja-JP")
-  }).onsuccess = () => {
-    document.getElementById("hitokoto-comment").value = "";
-    loadHitokoto();
-  };
-};
-
-// ========== メイン描画 ==========
 function render() {
-  const hash = location.hash.slice(1) || "home";
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  const hash = location.hash.slice(1) || "home";
   document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active");
 
-  let filtered = [...allData];
-  const q = document.getElementById("search").value.trim().toLowerCase();
-  if (q) {
-    filtered = filtered.filter(v => 
-      v.title.toLowerCase().includes(q) || 
-      v.uploader.toLowerCase().includes(q) || 
-      v.tags.some(t => t.toLowerCase().includes(q))
-    );
+  if (hash === "deleted") {
+    let filtered = deletedData.filter(v => {
+      const q = document.getElementById("search").value.toLowerCase();
+      return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || v.tags.some(t=>t.toLowerCase().includes(q));
+    });
+
+    const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+    currentPage = Math.min(currentPage, totalPages || 1);
+    const pageData = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+    let html = `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>タグ</th></tr></thead><tbody>`;
+    pageData.forEach((v,i) => {
+      const rank = filtered.indexOf(v) + 1;
+      html += `<tr>
+        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
+        <td><a href="${v.url}" target="_blank">${v.title}</a></td>
+        <td>${v.uploader}</td>
+        <td style="text-align:right;">${v.view.toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    document.getElementById("main").innerHTML = html;
+
+    let pagi = "";
+    for (let i=1; i<=totalPages; i++) {
+      pagi += `<button ${i===currentPage?'class="active"':''} onclick="currentPage=${i};render()">${i}</button>`;
+    }
+    document.getElementById("pagination").innerHTML = pagi;
+    return;
   }
 
+  // 既存のrenderコードはここにそのまま（省略せずに全部書く）
+  let filtered = allData.filter(v => {
+    const q = document.getElementById("search").value.toLowerCase();
+    return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || v.tags.some(t=>t.toLowerCase().includes(q));
+  });
+
   if (hash === "fav") {
-    const favs = Object.keys(localStorage).filter(k => k.startsWith("fav_")).map(k => k.slice(4));
+    const favs = [...localStorage].filter(k => k[0].startsWith("fav_")).map(k => k[0].slice(4));
     filtered = filtered.filter(v => favs.includes(v.sm));
   }
 
-  if (hash === "hitokoto") {
-    document.getElementById("main").innerHTML = "";
-    document.getElementById("pagination").innerHTML = "";
-    document.getElementById("hitokoto-section").style.display = "block";
-    return;
-  } else {
-    document.getElementById("hitokoto-section").style.display = "none";
-  }
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  currentPage = Math.min(currentPage, totalPages || 1);
+  const pageData = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
 
-  // ========== 転載・削除曲ページ ==========
-  if (hash === "deleted") {
-    document.title = "転載・削除曲 - ボカロ殿堂入りデータベース";
-    let html = `<h2 style="text-align:center;color:#ff4444;margin:2rem 0;font-size:2rem;">転載・削除された楽曲（全 ${deletedData.length} 曲）</h2>`;
-    if (deletedData.length === 0) {
-      html += "<p style='text-align:center;color:#999;padding:4rem;font-size:1.4rem;'>まだ登録されていません</p>";
-    } else {
-      html += `<table><thead><tr>
-        <th width="5%">#</th>
-        <th width="35%">曲名</th>
-        <th width="15%">投稿者</th>
-        <th width="15%">最終再生数</th>
-        <th width="15%">削除日</th>
-        <th width="15%">タグ</th>
-      </tr></thead><tbody>`;
-      deletedData.forEach((v, i) => {
-        html += `<tr>
-          <td style="text-align:center;font-weight:bold;color:#ff6666;">${i+1}</td>
-          <td><a href="${v.url}" target="_blank" style="color:#ff4444;font-weight:bold;font-size:1.1rem;">${v.title}</a></td>
-          <td>${v.uploader}</td>
-          <td style="text-align:right;font-weight:bold;color:#ff6666;">${v.lastView.toLocaleString()} 回</td>
-          <td style="text-align:center;">${v.deleteDate}</td>
-          <td>${v.tags.map(t => `<span class="tag deleted">${t}</span>`).join(" ")}</td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-    }
-    document.getElementById("main").innerHTML = html;
-    document.getElementById("pagination").innerHTML = "";
-    return;
-  }
+  let html = `<div style="text-align:center;margin:1rem;color:#555;">全 ${filtered.length} 曲中 ${(currentPage-1)*PAGE_SIZE+1}〜${Math.min(currentPage*PAGE_SIZE, filtered.length)} 件</div>`;
 
-  // ========== 通常ページ（ランキング・一覧など）==========
-  document.title = "ボカロ殿堂入りデータベース";
-  let html = "";
-
-  if (hash === "home" || hash === "") {
-    filtered.sort((a,b) => b.view - a.view);
-    html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>投稿日</th></tr></thead><tbody>`;
-    filtered.slice(0, 100).forEach((v, i) => {
-      const isFav = localStorage.getItem("fav_" + v.sm);
-      html += `<tr>
-        <td style="text-align:center;font-weight:bold;color:#00bfff;font-size:1.3rem;">${i+1}</td>
-        <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
-            <a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td>
-        <td>${v.uploader}</td>
-        <td style="text-align:right;font-weight:bold;">${v.view.toLocaleString()} 回</td>
-        <td style="text-align:center;">${v.date}</td>
-      </tr>`;
-    });
-    html += `</tbody></table>`;
-  }
-
-  // 一覧・P別・お気に入りは必要に応じて追加（省略）
+  filtered.sort((a,b) => b.view - a.view);
+  const ranked = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  html += "<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th></tr></thead><tbody>";
+  ranked.forEach((v,i) => {
+    const rank = filtered.indexOf(v) + 1;
+    const isFav = localStorage.getItem("fav_"+v.sm);
+    html += `<tr>
+      <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
+      <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+          <a href="https://www.nicovideo.jp/watch/${v.sm}" target="_blank">${v.title}</a></td>
+      <td>${v.uploader}</td>
+      <td style="text-align:right;">${v.view.toLocaleString()}</td>
+    </tr>`;
+  });
+  html += "</tbody></table>";
 
   document.getElementById("main").innerHTML = html;
-  document.getElementById("pagination").innerHTML = "";
-}
 
-render(); // 初回描画
+  let pagi = "";
+  for (let i=1; i<=totalPages; i++) {
+    pagi += `<button ${i===currentPage?'class="active"':''} onclick="currentPage=${i};render()">${i}</button>`;
+  }
+  document.getElementById("pagination").innerHTML = pagi;
+}
 </script>
 </body>
-</html>
+</html> 
+
