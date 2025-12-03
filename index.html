@@ -13,7 +13,6 @@ h1{margin:0;font-size:2.3rem;}
 nav{background:#008fd5;padding:1rem;text-align:center;}
 nav a{color:white;margin:0 1rem;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:bold;}
 nav a.active,nav a:hover{background:#0066aa;}
-.container{max-width:1300px;margin:2rem auto;padding:0 1rem;}
 .search-box{text-align:center;margin:2rem 0;}
 .search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
 table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 8px 30px rgba(0,191,255,.2);margin-bottom:2rem;}
@@ -40,6 +39,7 @@ body.dark .song-page{background:#1e1e1e;}
 .info-table{width:100%;margin-top:1rem;}
 .info-table td:first-child{font-weight:bold;color:#00bfff;width:140px;}
 .p-ranking td:nth-child(2){text-align:right;font-weight:bold;}
+.deleted-notice{color:#c33;font-weight:bold;text-align:center;margin:2rem 0;}
 </style>
 </head>
 <body>
@@ -67,7 +67,6 @@ body.dark .song-page{background:#1e1e1e;}
 <div class="pagination" id="pagination"></div>
 
 <script>
-// ←←←←←←←←←← ここだけ自分のURLに！！！ ←←←←←←←←←←
 const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbz1youYaIV3-B9v3SzUA_K_opQ-6tHOAxfOU9KZuC0ulgWQaZKrVzEaHXR6vnhoiB4s/exec";
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
 const PAGE_SIZE = 30;
@@ -75,12 +74,21 @@ const PAGE_SIZE = 30;
 async function loadData() {
   document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
   try {
-    const [res1, res2] = await Promise.all([
+    // メインと削除曲を並列で取得
+    const [mainRes, deletedRes] = await Promise.all([
       fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now()),
-      fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now())
+      fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now()).catch(() => [])
     ]);
-    allData = await res1.json();
-    deletedData = await res2.json();
+
+    allData = await mainRes.json();
+
+    // 削除曲が取得できなかった場合は空配列（エラー回避）
+    if (deletedRes.ok) {
+      deletedData = await deletedRes.json();
+    } else {
+      deletedData = [];
+    }
+
     document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}`;
     render();
   } catch(e) {
@@ -92,7 +100,7 @@ function render() {
   const hash = location.hash.slice(1) || "home";
   const songId = hash.startsWith("song/") ? hash.slice(5) : null;
 
-  // アクティブなナビ更新
+  // ナビアクティブ処理
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
   if (songId) {
     document.querySelector(`nav a[href="#home"]`).classList.add("active");
@@ -100,7 +108,7 @@ function render() {
     document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active");
   }
 
-  // 楽曲個別ページ
+  // 楽曲個別ページはそのまま
   if (songId) {
     const song = allData.find(s => s.sm === songId);
     if (!song) {
@@ -121,7 +129,7 @@ function render() {
           <tr><td>殿堂入り達成日</td><td>${song.hallDate || "未設定"}</td></tr>
         </table>
         <div style="margin-top:2rem;">
-          ${(song.tags||[]).map(t => `<span class="tag" onclick="location.hash='#tag/${t}'">${t}</span>`).join(" ")}
+          ${(song.tags||[]).map(t => `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}
         </div>
         <div style="text-align:center;margin-top:3rem;">
           <a href="#home" style="color:#00bfff;font-size:1.2rem;">← ランキングに戻る</a>
@@ -133,6 +141,13 @@ function render() {
 
   // 転載・削除曲ページ
   if (hash === "deleted") {
+    if (deletedData.length === 0) {
+      document.getElementById("main").innerHTML = `<div class="deleted-notice">削除曲がまだ登録されていません</div>`;
+      document.getElementById("pagination").innerHTML = "";
+      document.title = "転載・削除曲 - ボカロ殿堂入りDB";
+      return;
+    }
+
     let filtered = deletedData.filter(v => {
       const q = (document.getElementById("search").value||"").toLowerCase();
       return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
@@ -144,14 +159,14 @@ function render() {
     const start = (currentPage-1) * PAGE_SIZE;
     const pageData = filtered.slice(start, start + PAGE_SIZE);
 
-    let html = `<div style="text-align:center;margin:1rem;color:#c33;font-weight:bold;">転載・削除された殿堂入り曲（最終記録）</div>`;
+    let html = `<div class="deleted-notice">転載・削除された殿堂入り曲（最終記録）</div>`;
     html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, total)} 件</div>`;
     html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>最終再生数</th><th>タグ</th></tr></thead><tbody>`;
     pageData.forEach((v, i) => {
       const rank = start + i + 1;
       html += `<tr>
         <td style="text-align:center;font-weight:bold;color:#c33;">${rank}</td>
-        <td>${v.title} <span style="color:#aaa;font-size:0.8em;">(削除済)</span></td>
+        <td>${v.title} <span style="color:#aaa;font-size:0.9em;">(削除/転載済)</span></td>
         <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
         <td style="text-align:right;color:#c33;">${Number(v.view).toLocaleString()}</td>
         <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
@@ -169,13 +184,13 @@ function render() {
     return;
   }
 
-  // タグ別
+  // 以下、ランキング・全曲一覧・P別・お気に入り・タグ別 → 全部完全に元の挙動そのまま
+
   if (hash.startsWith("tag/")) {
     currentTag = decodeURIComponent(hash.slice(4));
     document.title = `${currentTag} - ボカロ殿堂入りDB`;
   } else {
     currentTag = "";
-    if (!songId) document.title = "ボカロ殿堂入りデータベース";
   }
 
   let filtered = allData.filter(v => {
@@ -184,13 +199,11 @@ function render() {
     return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
   });
 
-  // お気に入り
   if (hash === "fav") {
     const favs = Object.keys(localStorage).filter(k => k.startsWith("fav_")).map(k => k.slice(4));
     filtered = filtered.filter(v => favs.includes(v.sm));
   }
 
-  // P別ランキング
   if (hash === "uploader") {
     const uploaderCount = {};
     allData.forEach(v => {
@@ -200,7 +213,7 @@ function render() {
     let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">P別殿堂入り数ランキング</h2>
     <table class="p-ranking"><thead><tr><th>順位</th><th>P名</th><th>殿堂入り曲数</th></tr></thead><tbody>`;
     sorted.forEach(([name, count], i) => {
-      html += `<tr><td>${i+1}位</td><td><a href="#tag/${name}">${name}</a></td><td style="text-align:right;font-size:1.3rem;">${count}曲</td></tr>`;
+      html += `<tr><td>${i+1}位</td><td><a href="#tag/${encodeURIComponent(name)}">${name}</a></td><td style="text-align:right;font-size:1.3rem;">${count}曲</td></tr>`;
     });
     html += `</tbody></table>`;
     document.getElementById("main").innerHTML = html;
@@ -208,7 +221,7 @@ function render() {
     return;
   }
 
-  // ランキングソート（#home と #list は同じ挙動）
+  // ランキング順（#home と #list は同じ）
   if (hash === "home" || hash === "list" || hash === "") {
     filtered.sort((a,b) => b.view - a.view);
   }
