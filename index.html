@@ -38,15 +38,20 @@ body.dark .song-page{background:#1e1e1e;}
 .embed-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
 .info-table{width:100%;margin-top:1rem;}
 .info-table td:first-child{font-weight:bold;color:#00bfff;width:140px;}
-.p-ranking td:nth-child(2){text-align:right;font-weight:bold;}
 .deleted-notice{color:#c33;font-weight:bold;text-align:center;margin:2rem 0;}
 
-/* ホーム専用スタイル */
+/* P別ランキング：すべて左揃え */
+.p-ranking td{text-align:left !important;}
+.p-ranking td:nth-child(3){font-size:1.3rem;font-weight:bold;}
+
+/* ホーム画面スタイル（左揃え） */
 .home-section{margin:3rem auto;max-width:1000px;padding:0 1rem;}
-.today-song{background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 30px rgba(0,191,255,.3);margin-bottom:4rem;text-align:center;}
+.today-song{background:white;padding:2rem 2rem 2.5rem;border-radius:20px;box-shadow:0 10px 30px rgba(0,191,255,.3);margin-bottom:4rem;}
 body.dark .today-song{background:#1e1e1e;}
-.today-song h2{font-size:2rem;color:#00bfff;margin-bottom:1.5rem;}
-.anniversary-section h2{font-size:1.8rem;color:#00bfff;margin-bottom:1.5rem;text-align:center;}
+.today-song h2{font-size:2rem;color:#00bfff;margin-bottom:1.5rem;text-align:left;}
+.today-song h3{font-size:1.8rem;margin:1rem 0;text-align:left;}
+.today-song p{margin:0.5rem 0;text-align:left;}
+.anniversary-section h2{font-size:1.8rem;color:#00bfff;margin-bottom:1.5rem;text-align:left;}
 </style>
 </head>
 <body>
@@ -142,48 +147,42 @@ function render() {
     return;
   }
 
-  // === ホーム画面 ===
+  // ホーム画面
   if (hash === "home" || hash === "") {
     document.title = "ホーム - ボカロ殿堂入りデータベース";
 
-    // 今日の一曲（ランダム）
     const randomSong = allData[Math.floor(Math.random() * allData.length)];
 
-    // 今日の月日（MM-DD）
     const today = new Date();
     const todayMMDD = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-    // 周年曲（投稿日の月日が今日と同じもの）
     const anniversarySongs = allData.filter(song => {
       if (!song.date) return false;
       const dateStr = song.date.trim();
-      // 日付形式は "2023/01/01" や "2023-01-01" を想定
       const match = dateStr.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
       if (!match) return false;
       const mm = match[2].padStart(2,'0');
       const dd = match[3].padStart(2,'0');
       return `${mm}-${dd}` === todayMMDD;
-    }).sort((a,b) => b.view - a.view); // 再生数降順
+    }).sort((a,b) => b.view - a.view);
 
     let html = `<div class="home-section">`;
 
-    // 今日の一曲
     if (randomSong) {
       html += `
         <div class="today-song">
           <h2>🎲 今日の一曲</h2>
-          <h3 style="font-size:1.8rem;margin:1rem 0;"><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
-          <p style="color:#555;margin-bottom:1.5rem;">投稿者: <a href="#tag/${encodeURIComponent(randomSong.uploader)}">${randomSong.uploader}</a>　再生: ${Number(randomSong.view).toLocaleString()}回</p>
-          <div class="embed-container" style="max-width:800px;margin:0 auto;">
+          <h3><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
+          <p>投稿者: <a href="#tag/${encodeURIComponent(randomSong.uploader)}">${randomSong.uploader}</a>　再生: ${Number(randomSong.view).toLocaleString()}回</p>
+          <div class="embed-container" style="max-width:800px;margin:1.5rem auto;">
             <iframe src="https://ext.nicovideo.jp/thumb_watch/${randomSong.sm}?thumb_mode=html" allowfullscreen></iframe>
           </div>
-          <div style="margin-top:1.5rem;">
+          <div style="margin-top:1rem;">
             ${(randomSong.tags||[]).map(t => `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}
           </div>
         </div>`;
     }
 
-    // 今日の周年曲
     html += `<div class="anniversary-section">
       <h2>🎉 今日の周年曲（${today.getMonth()+1}月${today.getDate()}日 投稿）</h2>`;
     if (anniversarySongs.length === 0) {
@@ -209,10 +208,8 @@ function render() {
     return;
   }
 
-  // 以下は従来の挙動（ランキング・一覧など）
-
+  // 転載・削除曲
   if (hash === "deleted") {
-    // （変更なし、元のコードそのまま）
     if (deletedData.length === 0) {
       document.getElementById("main").innerHTML = `<div class="deleted-notice">削除曲がまだ登録されていません</div>`;
       document.getElementById("pagination").innerHTML = "";
@@ -256,6 +253,7 @@ function render() {
     return;
   }
 
+  // タグ別
   if (hash.startsWith("tag/")) {
     currentTag = decodeURIComponent(hash.slice(4));
     document.title = `${currentTag} - ボカロ殿堂入りDB`;
@@ -269,11 +267,13 @@ function render() {
     return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
   });
 
+  // お気に入り
   if (hash === "fav") {
     const favs = Object.keys(localStorage).filter(k => k.startsWith("fav_")).map(k => k.slice(4));
     filtered = filtered.filter(v => favs.includes(v.sm));
   }
 
+  // P別ランキング
   if (hash === "uploader") {
     const uploaderCount = {};
     allData.forEach(v => {
@@ -283,15 +283,20 @@ function render() {
     let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">P別殿堂入り数ランキング</h2>
     <table class="p-ranking"><thead><tr><th>順位</th><th>P名</th><th>殿堂入り曲数</th></tr></thead><tbody>`;
     sorted.forEach(([name, count], i) => {
-      html += `<tr><td>${i+1}位</td><td><a href="#tag/${encodeURIComponent(name)}">${name}</a></td><td style="text-align:right;font-size:1.3rem;">${count}曲</td></tr>`;
+      html += `<tr>
+        <td>${i+1}位</td>
+        <td><a href="#tag/${encodeURIComponent(name)}">${name}</a></td>
+        <td>${count}曲</td>
+      </tr>`;
     });
     html += `</tbody></table>`;
     document.getElementById("main").innerHTML = html;
     document.getElementById("pagination").innerHTML = "";
+    document.title = "P別ランキング - ボカロ殿堂入りDB";
     return;
   }
 
-  // ランキングと全曲一覧（再生数降順）
+  // ランキング・全曲一覧（再生数降順）
   if (hash === "ranking" || hash === "list") {
     filtered.sort((a,b) => b.view - a.view);
   }
@@ -324,6 +329,7 @@ function render() {
   }
   document.getElementById("pagination").innerHTML = pagi;
   document.getElementById("main").innerHTML = html;
+  document.title = "ボカロ殿堂入りDB";
 }
 
 function toggleFav(sm) {
