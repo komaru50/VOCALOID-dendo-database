@@ -11,22 +11,8 @@ body.dark{background:#121212;color:#eee;}
 header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
 h1{margin:0;font-size:2.3rem;}
 nav{background:#008fd5;padding:1rem;text-align:center;}
-/* ドロップダウンナビのスタイル */
-nav select{
-  padding:0.8rem 1.5rem;
-  font-size:1.1rem;
-  font-weight:bold;
-  border-radius:8px;
-  border:none;
-  background:#00bfff;
-  color:white;
-  cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-}
-nav select option{
-  background:#008fd5;
-  color:white;
-}
+nav a{color:white;margin:0 1rem;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:bold;}
+nav a.active,nav a:hover{background:#0066aa;}
 .search-box{text-align:center;margin:2rem 0;}
 .search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
 table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 8px 30px rgba(0,191,255,.2);margin-bottom:2rem;}
@@ -54,7 +40,7 @@ body.dark .song-page{background:#1e1e1e;}
 .info-table td:first-child{font-weight:bold;color:#00bfff;width:140px;}
 .deleted-notice{color:#c33;font-weight:bold;text-align:center;margin:2rem 0;}
 
-/* P別ランキング：左揃え */
+/* P別ランキング：すべて左揃え */
 .p-ranking td{text-align:left !important;}
 .p-ranking td:nth-child(3){font-size:1.3rem;font-weight:bold;}
 
@@ -77,15 +63,13 @@ body.dark .today-song{background:#1e1e1e;}
 </header>
 
 <nav>
-  <select id="page-select" onchange="location.hash = this.value">
-    <option value="home">ホーム</option>
-    <option value="ranking">ランキング</option>
-    <option value="list">全曲一覧</option>
-    <option value="uploader">P別ランキング</option>
-    <option value="fav">お気に入り</option>
-    <option value="deleted">転載・削除曲</option>
-    <option value="hitokoto">掲示板</option>
-  </select>
+<a href="#home" class="active">ホーム</a>
+<a href="#ranking">ランキング</a>
+<a href="#list">全曲一覧</a>
+<a href="#uploader">P別ランキング</a>
+<a href="#fav">お気に入り</a>
+<a href="#deleted">転載・削除曲</a>
+<a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
@@ -119,18 +103,18 @@ async function loadData() {
   }
 }
 
-function updateSelect() {
-  const hash = location.hash.slice(1) || "home";
-  const select = document.getElementById("page-select");
-  if (select) select.value = hash;
-}
-
 function render() {
   const hash = location.hash.slice(1) || "home";
   const songId = hash.startsWith("song/") ? hash.slice(5) : null;
 
-  // ドロップダウンの選択状態を更新
-  updateSelect();
+  // ナビアクティブ処理
+  document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  if (songId) {
+    document.querySelector(`nav a[href="#ranking"]`).classList.add("active");
+  } else {
+    document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active") ||
+    document.querySelector(`nav a[href="#home"]`).classList.add("active");
+  }
 
   // 楽曲個別ページ
   if (songId) {
@@ -312,7 +296,7 @@ function render() {
     return;
   }
 
-  // ランキング・全曲一覧
+  // ランキング・全曲一覧（再生数降順）
   if (hash === "ranking" || hash === "list") {
     filtered.sort((a,b) => b.view - a.view);
   }
