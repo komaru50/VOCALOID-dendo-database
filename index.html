@@ -84,6 +84,22 @@ const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbya-vAWaCl
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
 const PAGE_SIZE = 30;
 
+// hallDateをYYYY/MM/DD形式に変換する関数
+function formatHallDate(dateStr) {
+  if (!dateStr || dateStr === "未設定") return "未設定";
+  // すでにYYYY/MM/DD形式ならそのまま返す
+  if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) return dateStr;
+  // タイムスタンプ文字列の場合（例: Tue Sep 20 2011 ...）
+  const date = new Date(dateStr);
+  if (!isNaN(date.getTime())) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}/${m}/${d}`;
+  }
+  return dateStr; // 変換できない場合はそのまま
+}
+
 async function loadData() {
   document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
   try {
@@ -116,7 +132,7 @@ function render() {
     document.querySelector(`nav a[href="#home"]`).classList.add("active");
   }
 
-  // 楽曲個別ページ
+  // 楽曲個別ページ（ここを変更）
   if (songId) {
     const song = allData.find(s => s.sm === songId);
     if (!song) {
@@ -124,6 +140,9 @@ function render() {
       return;
     }
     document.title = `${song.title} - ボカロ殿堂入りDB`;
+
+    const formattedHallDate = formatHallDate(song.hallDate || "未設定");
+
     document.getElementById("main").innerHTML = `
       <div class="song-page">
         <h2>${song.title}</h2>
@@ -134,7 +153,7 @@ function render() {
           <tr><td>投稿日</td><td>${song.date || "不明"}</td></tr>
           <tr><td>投稿者</td><td>${song.uploader}</td></tr>
           <tr><td>再生数</td><td>${Number(song.view).toLocaleString()} 回</td></tr>
-          <tr><td>殿堂入り達成日</td><td>${song.hallDate || "未設定"}</td></tr>
+          <tr><td>殿堂入り達成日</td><td>${formattedHallDate}</td></tr>
         </table>
         <div style="margin-top:2rem;">
           ${(song.tags||[]).map(t => `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}
