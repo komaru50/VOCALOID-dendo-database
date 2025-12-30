@@ -63,16 +63,16 @@ body.dark .today-song{background:#1e1e1e;}
 </header>
 
 <nav>
-  <a href="#home" class="active">ホーム</a>
-  <a href="#ranking">総合ランキング</a>
-  <a href="#daily">デイリーランキング</a>
-  <a href="#weekly">週間ランキング</a>
-  <a href="#monthly">月間ランキング</a>
-  <a href="#list">全曲一覧</a>
-  <a href="#uploader">P別ランキング</a>
-  <a href="#fav">お気に入り</a>
-  <a href="#deleted">転載・削除曲</a>
-  <a href="#hitokoto">掲示板</a>
+<a href="#home" class="active">ホーム</a>
+<a href="#ranking">総合ランキング</a>
+<a href="#daily">デイリーランキング</a>
+<a href="#weekly">週間ランキング</a>
+<a href="#monthly">月間ランキング</a>
+<a href="#list">全曲一覧</a>
+<a href="#uploader">P別ランキング</a>
+<a href="#fav">お気に入り</a>
+<a href="#deleted">転載・削除曲</a>
+<a href="#hitokoto">掲示板</a>
 </nav>
 
 <div class="search-box">
@@ -83,16 +83,14 @@ body.dark .today-song{background:#1e1e1e;}
 <div class="pagination" id="pagination"></div>
 
 <script>
-const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbxMbR2EfRnab3OcnJGRfo8OOGz9N60Zj0nBs7noIPUE1RHvZuOZ1iE0jlxueICqEFf8/exec"; // ←←← 重要！新しいウェブアプリURLに変更
+const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbxp3kKxJ_zF765pPhvD8Zgf8sgXAGNwUBZ7LkMwHjrSMUJkOAQpAChSOdzYwjk3i4lz/exec";
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
 const PAGE_SIZE = 30;
 
-// viewを数値に変換する関数
 function toNumber(val) {
   return Number(val) || 0;
 }
 
-// hallDateをYYYY/MM/DD形式に変換する関数
 function formatHallDate(dateStr) {
   if (!dateStr || dateStr === "未設定") return "未設定";
   if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) return dateStr;
@@ -117,9 +115,9 @@ async function loadData() {
     allData = await mainRes.json();
     allData.forEach(song => {
       song.view = toNumber(song.view);
-      song.daily_diff = toNumber(song.daily_diff);
-      song.weekly_diff = toNumber(song.weekly_diff);
-      song.monthly_diff = toNumber(song.monthly_diff);
+      song.daily_diff = toNumber(song.daily_diff || 0);
+      song.weekly_diff = toNumber(song.weekly_diff || 0);
+      song.monthly_diff = toNumber(song.monthly_diff || 0);
     });
 
     if (deletedRes.ok) {
@@ -141,7 +139,6 @@ function render() {
   const hash = location.hash.slice(1) || "home";
   const songId = hash.startsWith("song/") ? hash.slice(5) : null;
 
-  // ナビアクティブ処理
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
   if (songId) {
     document.querySelector(`nav a[href="#ranking"]`).classList.add("active");
@@ -150,7 +147,6 @@ function render() {
     document.querySelector(`nav a[href="#home"]`).classList.add("active");
   }
 
-  // 楽曲個別ページ
   if (songId) {
     const song = allData.find(s => s.sm === songId);
     if (!song) {
@@ -182,7 +178,7 @@ function render() {
     return;
   }
 
-  // ホーム画面
+  // ホーム画面（周年曲はもともとのロジックそのまま）
   if (hash === "home" || hash === "") {
     document.title = "ホーム - ボカロ殿堂入りデータベース";
 
@@ -331,17 +327,16 @@ function render() {
     return;
   }
 
-  // デイリー / 週間 / 月間ランキング（新しく追加）
+  // デイリー・週間・月間ランキング（新規追加）
   if (hash === "daily" || hash === "weekly" || hash === "monthly") {
     let sortKey, titleText;
-    if (hash === "daily") { sortKey = "daily_diff"; titleText = "デイリーランキング（前日比増加数）"; }
-    if (hash === "weekly") { sortKey = "weekly_diff"; titleText = "週間ランキング（前週比増加数）"; }
-    if (hash === "monthly") { sortKey = "monthly_diff"; titleText = "月間ランキング（前月比増加数）"; }
+    if (hash === "daily") { sortKey = "daily_diff"; titleText = "デイリーランキング（前日増加数）"; }
+    if (hash === "weekly") { sortKey = "weekly_diff"; titleText = "週間ランキング（前週増加数）"; }
+    if (hash === "monthly") { sortKey = "monthly_diff"; titleText = "月間ランキング（前月増加数）"; }
 
     document.title = titleText + " - ボカロ殿堂入りDB";
 
-    // 増加0の曲は除外（必要ならコメントアウトして全曲表示に）
-    filtered = filtered.filter(v => v[sortKey] > 0);
+    filtered = allData.filter(v => v[sortKey] > 0);
     filtered.sort((a, b) => b[sortKey] - a[sortKey]);
 
     const total = filtered.length;
@@ -357,7 +352,7 @@ function render() {
     document.getElementById("pagination").innerHTML = pagi;
 
     let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">${titleText}</h2>`;
-    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, total)} 件表示</div>`;
+    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲（増加ありのみ）</div>`;
     html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>増加数</th><th>タグ</th></tr></thead><tbody>`;
     pageData.forEach((v, i) => {
       const rank = start + i + 1;
@@ -378,9 +373,8 @@ function render() {
     return;
   }
 
-  // 総合ランキング
+  // 総合ランキング・全曲一覧
   if (hash === "ranking") {
-    document.title = "総合ランキング - ボカロ殿堂入りDB";
     filtered.sort((a,b) => b.view - a.view);
   } else if (hash === "list") {
     filtered.sort((a, b) => a.uploader.localeCompare(b.uploader));
