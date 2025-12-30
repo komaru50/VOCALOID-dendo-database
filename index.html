@@ -112,12 +112,14 @@ async function loadData() {
       fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now()).catch(() => [])
     ]);
 
-    allData = await mainRes.json();
+        allData = await mainRes.json();
     allData.forEach(song => {
       song.view = toNumber(song.view);
       song.daily_diff = toNumber(song.daily_diff || 0);
       song.weekly_diff = toNumber(song.weekly_diff || 0);
       song.monthly_diff = toNumber(song.monthly_diff || 0);
+      // dateが空なら強制的に "" に（フィルタで除外されるように）
+      if (!song.date) song.date = "";
     });
 
     if (deletedRes.ok) {
