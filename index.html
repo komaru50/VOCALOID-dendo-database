@@ -183,14 +183,26 @@ function render() {
     const todayMMDD = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
     const anniversarySongs = allData.filter(song => {
-      if (!song.date) return false;
-      const dateStr = song.date.trim();
-      const match = dateStr.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
-      if (!match) return false;
-      const mm = match[2].padStart(2,'0');
-      const dd = match[3].padStart(2,'0');
-      return `${mm}-${dd}` === todayMMDD;
-    }).sort((a,b) => b.view - a.view);
+  // 投稿日が存在しない場合は除外
+  if (!song.date) return false;
+
+  // 念のため文字列化してトリム
+  const dateStr = song.date.toString().trim();
+
+  // Date オブジェクトに変換
+  const d = new Date(dateStr);
+
+  // 不正な日付は除外
+  if (isNaN(d.getTime())) return false;
+
+  // 月・日を取得（JST想定）
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+
+  // 今日の MM-DD と比較
+  return `${mm}-${dd}` === todayMMDD;
+}).sort((a, b) => b.view - a.view);
+
 
     let html = `<div class="home-section">`;
 
