@@ -182,27 +182,29 @@ function render() {
     const today = new Date();
     const todayMMDD = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-    const anniversarySongs = allData.filter(song => {
-  // 投稿日が存在しない場合は除外
-  if (!song.date) return false;
+anniversarySongs.forEach((song, i) => {
 
-  // 念のため文字列化してトリム
-  const dateStr = song.date.toString().trim();
+  // 投稿日が無い場合の保険
+  let postYear = "不明";
 
-  // Date オブジェクトに変換
-  const d = new Date(dateStr);
+  if (song.date) {
+    const dateStr = song.date.toString().trim();
+    const d = new Date(dateStr);
 
-  // 不正な日付は除外
-  if (isNaN(d.getTime())) return false;
+    // 正しい Date のみ処理
+    if (!isNaN(d.getTime())) {
+      postYear = d.getFullYear() + "年";
+    }
+  }
 
-  // 月・日を取得（JST想定）
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-
-  // 今日の MM-DD と比較
-  return `${mm}-${dd}` === todayMMDD;
-}).sort((a, b) => b.view - a.view);
-
+  html += `<tr>
+    <td style="text-align:center;font-weight:bold;color:#00bfff;">${i + 1}</td>
+    <td><a href="#song/${song.sm}">${song.title}</a></td>
+    <td><a href="#tag/${encodeURIComponent(song.uploader)}">${song.uploader}</a></td>
+    <td style="text-align:right;">${song.view.toLocaleString()}</td>
+    <td style="text-align:center;">${postYear}</td>
+  </tr>`;
+});
 
     let html = `<div class="home-section">`;
 
