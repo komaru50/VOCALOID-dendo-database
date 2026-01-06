@@ -100,9 +100,31 @@ function formatHallDate(dateStr) {
 
 function formatDateYMD(dateStr) {
   if (!dateStr) return "不明";
-  if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) return dateStr;
+
+  // 文字列化（Date型対策）
+  let s = String(dateStr).trim();
+
+  // yyyy/mm/dd hh:mm:ss → yyyy/mm/dd
+  s = s.replace(/^(\d{4}\/\d{2}\/\d{2}).*$/, "$1");
+
+  // yyyy-mm-dd → yyyy/mm/dd
+  s = s.replace(/-/g, "/");
+
+  // 最終チェック
+  if (/^\d{4}\/\d{2}\/\d{2}$/.test(s)) return s;
+
+  // Dateとして解釈できるならフォーマット
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}/${m}/${day}`;
+  }
+
   return "不明";
 }
+
 
   
 async function loadData() {
