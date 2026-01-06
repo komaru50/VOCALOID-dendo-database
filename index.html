@@ -178,6 +178,21 @@ function render() {
     const today = new Date();
     const todayMMDD = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+    // ===== 🎲 今日の1曲（ランダム・日付固定）=====
+　const seed =
+  　today.getFullYear() * 10000 +
+  　(today.getMonth() + 1) * 100 +
+  　today.getDate();
+
+　function seededRandom(seed) {
+  　const x = Math.sin(seed) * 10000;
+  　return x - Math.floor(x);
+　}
+
+　const randomIndex = Math.floor(seededRandom(seed) * allData.length);
+　const randomSong = allData[randomIndex];
+
+
     const anniversarySongs = allData.filter(song => {
       if (!song.date) return false;
       const dateStr = song.date.toString().trim();
@@ -189,6 +204,33 @@ function render() {
     }).sort((a, b) => b.view - a.view);
 
     let html = `<div class="home-section">`;
+    if (randomSong) {
+  html += `
+  <div class="today-song">
+    <h2>🎲 今日の1曲</h2>
+    <h3><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
+    <p>
+      投稿者：
+      <a href="#tag/${encodeURIComponent(randomSong.uploader)}">
+        ${randomSong.uploader}
+      </a>
+      　
+      再生数：${randomSong.view.toLocaleString()}回
+    </p>
+    <div class="embed-container" style="max-width:800px;margin:1.5rem auto;">
+      <iframe
+        src="https://ext.nicovideo.jp/thumb_watch/${randomSong.sm}?thumb_mode=html"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <div>
+      ${(randomSong.tags || []).map(t =>
+        `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`
+      ).join(" ")}
+    </div>
+  </div>`;
+}
+
     html += `<div class="anniversary-section">
       <h2>🎉 今日の周年曲（${today.getMonth() + 1}月${today.getDate()}日 投稿）</h2>`;
 
