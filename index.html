@@ -62,8 +62,6 @@ body.dark .today-song{background:#1e1e1e;}
 <a href="#home" class="active">ホーム</a>
 <a href="#ranking">総合ランキング</a>
 <a href="#daily">デイリーランキング</a>
-<a href="#weekly">週間ランキング</a>
-<a href="#monthly">月間ランキング</a>
 <a href="#list">全曲一覧</a>
 <a href="#uploader">P別ランキング</a>
 <a href="#fav">お気に入り</a>
@@ -348,43 +346,7 @@ function render() {
     return;
   }
 
-  // 日別・週別・月別ランキング
-  if (hash === "daily" || hash === "weekly" || hash === "monthly") {
-    let sortKey, titleText;
-    if (hash==="daily"){sortKey="daily_diff"; titleText="デイリーランキング（前日増加数）";}
-    if (hash==="weekly"){sortKey="weekly_diff"; titleText="週間ランキング（前週増加数）";}
-    if (hash==="monthly"){sortKey="monthly_diff"; titleText="月間ランキング（前月増加数）";}
-    document.title = titleText + " - ボカロ殿堂入りDB";
-    filtered = allData.filter(v => v[sortKey]>0).sort((a,b)=>b[sortKey]-a[sortKey]);
-    const total = filtered.length;
-    const pages = Math.ceil(total/PAGE_SIZE);
-    currentPage = Math.min(currentPage,pages||1);
-    const start = (currentPage-1)*PAGE_SIZE;
-    const pageData = filtered.slice(start,start+PAGE_SIZE);
-    let pagi = "";
-    for (let i=1;i<=pages;i++) pagi += `<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
-    document.getElementById("pagination").innerHTML = pagi;
-    let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">${titleText}</h2>`;
-    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲（増加ありのみ）</div>`;
-    html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>増加数</th><th>タグ</th></tr></thead><tbody>`;
-    pageData.forEach((v,i)=>{
-      const rank = start+i+1;
-      const isFav = localStorage.getItem("fav_"+v.sm);
-      html += `<tr>
-        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
-        <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
-            <a href="#song/${v.sm}">${v.title}</a></td>
-        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
-        <td style="text-align:right;">${v.view.toLocaleString()}</td>
-        <td style="text-align:right;font-weight:bold;color:#ff4444;">+${v[sortKey].toLocaleString()}</td>
-        <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
-      </tr>`;
-    });
-    html += `</tbody></table>`;
-    document.getElementById("main").innerHTML = html;
-    return;
-  }
-
+  
   // 総合ランキング or 全曲一覧
   if (hash==="ranking") filtered.sort((a,b)=>b.view-a.view);
   else if (hash==="list") filtered.sort((a,b)=>a.uploader.localeCompare(b.uploader));
