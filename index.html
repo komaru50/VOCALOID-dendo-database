@@ -98,6 +98,13 @@ function formatHallDate(dateStr) {
   return dateStr;
 }
 
+function formatDateYMD(dateStr) {
+  if (!dateStr) return "不明";
+  if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) return dateStr;
+  return "不明";
+}
+
+  
 async function loadData() {
   document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
   try {
@@ -156,7 +163,7 @@ function render() {
           <iframe src="https://ext.nicovideo.jp/thumb_watch/${song.sm}?thumb_mode=html" allowfullscreen></iframe>
         </div>
         <table class="info-table">
-          <tr><td>投稿日</td><td>${song.date || "不明"}</td></tr>
+          <tr><td>投稿日</td><td>${formatDateYMD(song.date)}</td></tr>
           <tr><td>投稿者</td><td>${song.uploader}</td></tr>
           <tr><td>再生数</td><td>${song.view.toLocaleString()} 回</td></tr>
           <tr><td>殿堂入り達成日</td><td>${formattedHallDate}</td></tr>
@@ -248,8 +255,9 @@ function render() {
         <tbody>`;
       anniversarySongs.forEach((song, i) => {
         let postYear = "不明";
-        const d = new Date(song.date);
-        if (!isNaN(d.getTime())) postYear = d.getFullYear() + "年";
+　if (song.date && /^\d{4}\/\d{2}\/\d{2}$/.test(song.date)) {
+  postYear = song.date.slice(0, 4) + "年";
+　}
         html += `<tr>
           <td style="text-align:center;font-weight:bold;color:#00bfff;">${i + 1}</td>
           <td><a href="#song/${song.sm}">${song.title}</a></td>
