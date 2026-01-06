@@ -2,208 +2,392 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ボカロ殿堂入りDB</title>
+<title>ボカロ殿堂入りデータベース</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
-  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 0;
-}
-header {
-  background: #00bfff;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  background: #eaf6ff;
-  padding: 0.5rem;
-}
-nav a {
-  color: #0077aa;
-  text-decoration: none;
-  font-weight: bold;
-}
-nav a:hover {
-  text-decoration: underline;
-}
-#main {
-  padding: 1rem;
-  max-width: 1200px;
-  margin: auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-th, td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-}
-th {
-  background: #f0f8ff;
-}
-.tag {
-  display: inline-block;
-  background: #e0f4ff;
-  color: #0077aa;
-  padding: 2px 6px;
-  margin: 2px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.section {
-  margin-bottom: 2.5rem;
-}
-.section h2 {
-  color: #00bfff;
-  text-align: center;
-}
-.random-box {
-  background: white;
-  border: 2px dashed #00bfff;
-  padding: 1rem;
-  text-align: center;
-  border-radius: 8px;
-}
-.random-box h3 {
-  margin: 0.5rem 0;
-}
-.anniv-table td {
-  font-size: 0.95rem;
-}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+body{font-family:'Noto Sans JP',sans-serif;background:#f5fbff;color:#222;margin:0;}
+body.dark{background:#121212;color:#eee;}
+header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
+h1{margin:0;font-size:2.3rem;}
+nav{background:#008fd5;padding:1rem;text-align:center;display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;}
+nav a{color:white;padding:0.6rem 1rem;border-radius:8px;text-decoration:none;font-weight:bold;font-size:1rem;transition:0.3s;}
+nav a.active,nav a:hover{background:#0066aa;}
+.search-box{text-align:center;margin:2rem 0;}
+.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;outline:none;}
+table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 8px 30px rgba(0,191,255,.2);margin-bottom:2rem;}
+body.dark table{background:#1e1e1e;}
+th{background:#00bfff;color:white;padding:1.2rem;}
+td{padding:1rem;border-bottom:1px solid #ddd;}
+tr:hover{background:#f0fbff;}
+body.dark tr:hover{background:#2a2a2a;}
+a{color:#00bfff;text-decoration:none;font-weight:600;}
+.tag{display:inline-block;background:#00aaff;color:white;padding:.4rem .9rem;border-radius:30px;margin:0.3rem;font-size:0.9rem;cursor:pointer;transition:0.3s;}
+.tag:hover{background:#0088cc;transform:scale(1.1);}
+.last-update{position:absolute;top:70px;right:20px;color:rgba(255,255,255,.9);font-size:0.9rem;}
+#darkmode{position:absolute;top:20px;left:20px;background:#333;color:white;padding:.8rem 1.2rem;border-radius:50%;cursor:pointer;font-size:0.9rem;}
+.fav{cursor:pointer;font-size:1.5rem;margin-right:8px;transition:.3s;}
+.fav.on{color:#ff4444;transform:scale(1.2);}
+.loading{text-align:center;padding:4rem;font-size:1.6rem;color:#0066aa;}
+.pagination{text-align:center;margin:2rem 0;}
+.pagination button{padding:.7rem 1.3rem;margin:0 .3rem;border:none;border-radius:8px;background:#00bfff;color:white;cursor:pointer;}
+.pagination button.active{background:#0066aa;}
+.song-page{max-width:900px;margin:3rem auto;background:white;padding:3rem;border-radius:20px;box-shadow:0 15px 40px rgba(0,191,255,.3);}
+body.dark .song-page{background:#1e1e1e;}
+.embed-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:15px;margin:2rem 0;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.embed-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.info-table{width:100%;margin-top:1rem;}
+.info-table td:first-child{font-weight:bold;color:#00bfff;width:140px;}
+.deleted-notice{color:#c33;font-weight:bold;text-align:center;margin:2rem 0;}
+.p-ranking td{text-align:left !important;}
+.p-ranking td:nth-child(3){font-size:1.3rem;font-weight:bold;}
+.home-section{margin:3rem auto;max-width:1000px;padding:0 1rem;}
+.today-song{background:white;padding:2rem 2rem 2.5rem;border-radius:20px;box-shadow:0 10px 30px rgba(0,191,255,.3);margin-bottom:4rem;}
+body.dark .today-song{background:#1e1e1e;}
+.today-song h2{font-size:2rem;color:#00bfff;margin-bottom:1.5rem;text-align:left;}
+.today-song h3{font-size:1.8rem;margin:1rem 0;text-align:left;}
+.today-song p{margin:0.5rem 0;text-align:left;}
+.anniversary-section h2{font-size:1.8rem;color:#00bfff;margin-bottom:1.5rem;text-align:left;}
 </style>
 </head>
-
 <body>
-<header>🎧 ボカロ殿堂入りDB</header>
+
+<header>
+<h1>ボカロ殿堂入りデータベース</h1>
+<div class="last-update" id="last-update">読み込み中…</div>
+<div id="darkmode">Night</div>
+</header>
 
 <nav>
-  <a href="#home">HOME</a>
-  <a href="#ranking">RANKING</a>
-  <a href="#list">LIST</a>
+<a href="#home" class="active">ホーム</a>
+<a href="#ranking">総合ランキング</a>
+<a href="#daily">デイリーランキング</a>
+<a href="#weekly">週間ランキング</a>
+<a href="#monthly">月間ランキング</a>
+<a href="#list">全曲一覧</a>
+<a href="#uploader">P別ランキング</a>
+<a href="#fav">お気に入り</a>
+<a href="#deleted">転載・削除曲</a>
+<a href="#hitokoto">掲示板</a>
 </nav>
 
-<div id="main">読み込み中...</div>
+<div class="search-box">
+<input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
+</div>
+
+<div class="container" id="main"></div>
+<div class="pagination" id="pagination"></div>
 
 <script>
-const API_URL = "（あなたのAppsScriptのURL）";
+const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
+let allData = [], deletedData = [], currentTag = "", currentPage = 1;
+const PAGE_SIZE = 30;
 
-let allData = [];
+function toNumber(val) {
+  return Number(val) || 0;
+}
 
-function seededRandom(seed) {
-  let x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
+function formatHallDate(dateStr) {
+  if (!dateStr || dateStr === "未設定") return "未設定";
+  if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) return dateStr;
+  const date = new Date(dateStr);
+  if (!isNaN(date.getTime())) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}/${m}/${d}`;
+  }
+  return dateStr;
 }
 
 async function loadData() {
-  const res = await fetch(API_URL);
-  allData = await res.json();
-  render();
+  document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
+  try {
+    const [mainRes, deletedRes] = await Promise.all([
+      fetch(SPREADSHEET_JSON_URL + "?t=" + Date.now()),
+      fetch(SPREADSHEET_JSON_URL + "?type=deleted&t=" + Date.now()).catch(() => [])
+    ]);
+
+    allData = await mainRes.json();
+    allData.forEach(song => {
+      song.view = toNumber(song.view);
+      song.daily_diff = toNumber(song.daily_diff || 0);
+      song.weekly_diff = toNumber(song.weekly_diff || 0);
+      song.monthly_diff = toNumber(song.monthly_diff || 0);
+    });
+
+    if (deletedRes.ok) {
+      deletedData = await deletedRes.json();
+      deletedData.forEach(song => song.view = toNumber(song.view));
+    } else {
+      deletedData = [];
+    }
+
+    document.getElementById("last-update").textContent = `最終更新：${new Date().toLocaleString("ja-JP")}`;
+    render();
+  } catch(e) {
+    console.error("データ読み込みエラー:", e);
+    document.getElementById("main").innerHTML = "<div class='loading' style='color:#c33;'>読み込み失敗…リロードしてください</div>";
+  }
 }
 
 function render() {
-  const hash = location.hash.replace("#", "") || "home";
+  const hash = location.hash.slice(1) || "home";
+  const songId = hash.startsWith("song/") ? hash.slice(5) : null;
 
-  if (hash === "home") {
-    renderHome();
+  document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  if (songId) {
+    document.querySelector(`nav a[href="#ranking"]`).classList.add("active");
+  } else {
+    document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active") ||
+    document.querySelector(`nav a[href="#home"]`).classList.add("active");
+  }
+
+  if (songId) {
+    const song = allData.find(s => s.sm === songId);
+    if (!song) {
+      document.getElementById("main").innerHTML = "<div class='loading'>楽曲が見つかりません…</div>";
+      return;
+    }
+    document.title = `${song.title} - ボカロ殿堂入りDB`;
+    const formattedHallDate = formatHallDate(song.hallDate || "未設定");
+    document.getElementById("main").innerHTML = `
+      <div class="song-page">
+        <h2>${song.title}</h2>
+        <div class="embed-container">
+          <iframe src="https://ext.nicovideo.jp/thumb_watch/${song.sm}?thumb_mode=html" allowfullscreen></iframe>
+        </div>
+        <table class="info-table">
+          <tr><td>投稿日</td><td>${song.date || "不明"}</td></tr>
+          <tr><td>投稿者</td><td>${song.uploader}</td></tr>
+          <tr><td>再生数</td><td>${song.view.toLocaleString()} 回</td></tr>
+          <tr><td>殿堂入り達成日</td><td>${formattedHallDate}</td></tr>
+        </table>
+        <div style="margin-top:2rem;">
+          ${(song.tags||[]).map(t => `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}
+        </div>
+        <div style="text-align:center;margin-top:3rem;">
+          <a href="#ranking" style="color:#00bfff;font-size:1.2rem;">← ランキングに戻る</a>
+        </div>
+      </div>`;
+    document.getElementById("pagination").innerHTML = "";
     return;
   }
-}
 
-function renderHome() {
-  const today = new Date();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
+  if (hash === "home" || hash === "") {
+    const today = new Date();
+    const todayMMDD = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  /* =====================
-     🎲 今日の1曲（固定ランダム）
-     ===================== */
-  const seed = Number(
-    today.getFullYear().toString() +
-    ("0" + month).slice(-2) +
-    ("0" + day).slice(-2)
-  );
+    const anniversarySongs = allData.filter(song => {
+      if (!song.date) return false;
+      const dateStr = song.date.toString().trim();
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return false;
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${mm}-${dd}` === todayMMDD;
+    }).sort((a, b) => b.view - a.view);
 
-  const randomIndex = Math.floor(seededRandom(seed) * allData.length);
-  const randomSong = allData[randomIndex];
+    let html = `<div class="home-section">`;
+    html += `<div class="anniversary-section">
+      <h2>🎉 今日の周年曲（${today.getMonth() + 1}月${today.getDate()}日 投稿）</h2>`;
 
-  let html = `<div class="section">
-    <h2>🎲 今日の1曲</h2>
-    <div class="random-box">
-      <h3><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
-      <div>投稿者：${randomSong.uploader}</div>
-      <div>再生数：${randomSong.view.toLocaleString()} 回</div>
-      <div style="margin-top:0.5rem;">
-        ${(randomSong.tags || []).map(t =>
-          `<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`
-        ).join(" ")}
-      </div>
-    </div>
-  </div>`;
+    if (anniversarySongs.length === 0) {
+      html += `<p style="text-align:center;color:#888;">今日は周年を迎える殿堂入り曲がありませんでした。</p>`;
+    } else {
+      html += `<table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>曲名</th>
+            <th>投稿者</th>
+            <th>再生数</th>
+            <th>投稿年</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      anniversarySongs.forEach((song, i) => {
+        let postYear = "不明";
+        const d = new Date(song.date);
+        if (!isNaN(d.getTime())) postYear = d.getFullYear() + "年";
+        html += `<tr>
+          <td style="text-align:center;font-weight:bold;color:#00bfff;">${i + 1}</td>
+          <td><a href="#song/${song.sm}">${song.title}</a></td>
+          <td><a href="#tag/${encodeURIComponent(song.uploader)}">${song.uploader}</a></td>
+          <td style="text-align:right;">${song.view.toLocaleString()}</td>
+          <td style="text-align:center;">${postYear}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+    }
 
-  /* =====================
-     🎉 今日の周年曲
-     ===================== */
-  const anniversarySongs = allData.filter(song => {
-    if (!song.date) return false;
-    const d = new Date(song.date);
-    if (isNaN(d.getTime())) return false;
-    return (d.getMonth() + 1 === month && d.getDate() === day);
-  });
-
-  html += `<div class="section">
-    <h2>🎉 今日の周年曲</h2>`;
-
-  if (anniversarySongs.length === 0) {
-    html += `<div style="text-align:center;color:#666;">今日は周年曲がありません</div>`;
-  } else {
-    html += `<table class="anniv-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>曲名</th>
-          <th>投稿者</th>
-          <th>再生数</th>
-          <th>投稿年</th>
-        </tr>
-      </thead>
-      <tbody>`;
-
-    anniversarySongs.forEach((song, i) => {
-      let postYear = "不明";
-      const d = new Date(song.date);
-      if (!isNaN(d.getTime())) {
-        postYear = d.getFullYear() + "年";
-      }
-
-      html += `<tr>
-        <td style="text-align:center;">${i + 1}</td>
-        <td><a href="#song/${song.sm}">${song.title}</a></td>
-        <td>${song.uploader}</td>
-        <td style="text-align:right;">${song.view.toLocaleString()}</td>
-        <td style="text-align:center;">${postYear}</td>
-      </tr>`;
-    });
-
-    html += `</tbody></table>`;
+    html += `</div></div>`;
+    document.getElementById("main").innerHTML = html;
+    document.getElementById("pagination").innerHTML = "";
+    return;
   }
 
-  html += `</div>`;
+  // ここからは削除曲、タグ、ランキング、リストなど既存の処理
+  if (hash === "deleted") {
+    if (deletedData.length === 0) {
+      document.getElementById("main").innerHTML = `<div class="deleted-notice">削除曲がまだ登録されていません</div>`;
+      document.getElementById("pagination").innerHTML = "";
+      document.title = "転載・削除曲 - ボカロ殿堂入りDB";
+      return;
+    }
+    let filtered = deletedData.filter(v => {
+      const q = (document.getElementById("search").value||"").toLowerCase();
+      return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
+    });
+    const total = filtered.length;
+    const pages = Math.ceil(total / PAGE_SIZE);
+    currentPage = Math.min(currentPage, pages || 1);
+    const start = (currentPage-1) * PAGE_SIZE;
+    const pageData = filtered.slice(start, start + PAGE_SIZE);
 
-  document.getElementById("main").innerHTML = html;
+    let html = `<div class="deleted-notice">転載・削除された殿堂入り曲（最終記録）</div>`;
+    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${start+1}〜${Math.min(start+PAGE_SIZE, total)} 件</div>`;
+    html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>最終再生数</th><th>タグ</th></tr></thead><tbody>`;
+    pageData.forEach((v, i) => {
+      const rank = start + i + 1;
+      html += `<tr>
+        <td style="text-align:center;font-weight:bold;color:#c33;">${rank}</td>
+        <td>${v.title} <span style="color:#aaa;font-size:0.9em;">(削除/転載済)</span></td>
+        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+        <td style="text-align:right;color:#c33;">${v.view.toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    let pagi = "";
+    for (let i=1; i<=pages; i++) {
+      pagi += `<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
+    }
+    document.getElementById("pagination").innerHTML = pagi;
+    document.getElementById("main").innerHTML = html;
+    document.title = "転載・削除曲 - ボカロ殿堂入りDB";
+    return;
+  }
+
+  // タグ検索
+  if (hash.startsWith("tag/")) currentTag = decodeURIComponent(hash.slice(4));
+  else currentTag = "";
+
+  let filtered = allData.filter(v => {
+    if (currentTag) return v.tags?.includes(currentTag);
+    const q = (document.getElementById("search").value||"").toLowerCase();
+    return !q || v.title.toLowerCase().includes(q) || v.uploader.toLowerCase().includes(q) || (v.tags||[]).some(t=>t.toLowerCase().includes(q));
+  });
+
+  // お気に入り
+  if (hash === "fav") {
+    const favs = Object.keys(localStorage).filter(k => k.startsWith("fav_")).map(k => k.slice(4));
+    filtered = filtered.filter(v => favs.includes(v.sm));
+  }
+
+  // P別ランキング
+  if (hash === "uploader") {
+    const uploaderCount = {};
+    allData.forEach(v => uploaderCount[v.uploader] = (uploaderCount[v.uploader]||0)+1);
+    const sorted = Object.entries(uploaderCount).sort((a,b)=>b[1]-a[1]);
+    let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">P別殿堂入り数ランキング</h2>
+    <table class="p-ranking"><thead><tr><th>順位</th><th>P名</th><th>殿堂入り曲数</th></tr></thead><tbody>`;
+    sorted.forEach(([name,count],i)=>{
+      html += `<tr>
+        <td>${i+1}位</td>
+        <td><a href="#tag/${encodeURIComponent(name)}">${name}</a></td>
+        <td>${count}曲</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById("main").innerHTML = html;
+    document.getElementById("pagination").innerHTML = "";
+    document.title = "P別ランキング - ボカロ殿堂入りDB";
+    return;
+  }
+
+  // 日別・週別・月別ランキング
+  if (hash === "daily" || hash === "weekly" || hash === "monthly") {
+    let sortKey, titleText;
+    if (hash==="daily"){sortKey="daily_diff"; titleText="デイリーランキング（前日増加数）";}
+    if (hash==="weekly"){sortKey="weekly_diff"; titleText="週間ランキング（前週増加数）";}
+    if (hash==="monthly"){sortKey="monthly_diff"; titleText="月間ランキング（前月増加数）";}
+    document.title = titleText + " - ボカロ殿堂入りDB";
+    filtered = allData.filter(v => v[sortKey]>0).sort((a,b)=>b[sortKey]-a[sortKey]);
+    const total = filtered.length;
+    const pages = Math.ceil(total/PAGE_SIZE);
+    currentPage = Math.min(currentPage,pages||1);
+    const start = (currentPage-1)*PAGE_SIZE;
+    const pageData = filtered.slice(start,start+PAGE_SIZE);
+    let pagi = "";
+    for (let i=1;i<=pages;i++) pagi += `<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
+    document.getElementById("pagination").innerHTML = pagi;
+    let html = `<h2 style="text-align:center;color:#00bfff;margin:2rem;">${titleText}</h2>`;
+    html += `<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲（増加ありのみ）</div>`;
+    html += `<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>増加数</th><th>タグ</th></tr></thead><tbody>`;
+    pageData.forEach((v,i)=>{
+      const rank = start+i+1;
+      const isFav = localStorage.getItem("fav_"+v.sm);
+      html += `<tr>
+        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
+        <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+            <a href="#song/${v.sm}">${v.title}</a></td>
+        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+        <td style="text-align:right;">${v.view.toLocaleString()}</td>
+        <td style="text-align:right;font-weight:bold;color:#ff4444;">+${v[sortKey].toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById("main").innerHTML = html;
+    return;
+  }
+
+  // 総合ランキング or 全曲一覧
+  if (hash==="ranking") filtered.sort((a,b)=>b.view-a.view);
+  else if (hash==="list") filtered.sort((a,b)=>a.uploader.localeCompare(b.uploader));
+
+  const total = filtered.length;
+  let pageData, pagi="";
+  if(hash==="list"){pageData=filtered;currentPage=1;document.getElementById("pagination").innerHTML="";}
+  else{
+    const pages = Math.ceil(total/PAGE_SIZE);
+    currentPage=Math.min(currentPage,pages||1);
+    const start=(currentPage-1)*PAGE_SIZE;
+    pageData=filtered.slice(start,start+PAGE_SIZE);
+    for(let i=1;i<=pages;i++) pagi+=`<button ${i===currentPage?"class='active'":""} onclick="currentPage=${i};render()">${i}</button>`;
+    document.getElementById("pagination").innerHTML=pagi;
+  }
+
+  let html=`<div style="text-align:center;margin:1rem;color:#555;">全 ${total} 曲中 ${currentTag?`（タグ: ${currentTag}）`: ""}</div>`;
+  html+=`<table><thead><tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>タグ</th></tr></thead><tbody>`;
+  pageData.forEach((v,i)=>{
+    const rank = filtered.indexOf(v)+1;
+    const isFav = localStorage.getItem("fav_"+v.sm);
+    html+=`<tr>
+      <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
+      <td><span class="fav ${isFav?'on':''}" onclick="toggleFav('${v.sm}')">★</span>
+          <a href="#song/${v.sm}">${v.title}</a></td>
+      <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+      <td style="text-align:right;">${v.view.toLocaleString()}</td>
+      <td>${(v.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}</td>
+    </tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById("main").innerHTML=html;
 }
 
-window.onhashchange = render;
-window.onload = loadData;
+function toggleFav(sm){
+  const key="fav_"+sm;
+  if(localStorage.getItem(key)) localStorage.removeItem(key);
+  else localStorage.setItem(key,"1");
+  render();
+}
+
+document.getElementById("darkmode").onclick=()=>document.body.classList.toggle("dark");
+document.getElementById("search").oninput=()=>{currentPage=1;render();};
+window.onhashchange=()=>{currentPage=1;render();};
+window.onload=loadData;
 </script>
 </body>
 </html>
