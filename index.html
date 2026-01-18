@@ -65,8 +65,8 @@ body.dark .today-song{background:#1e1e1e;}
 <a href="#uploader">P別ランキング</a>
 <a href="#fav">お気に入り</a>
 <a href="#deleted">転載・削除曲</a>
-<a href=#"dendofastestranking">殿堂入り最速ランキング</a>
-</nav>
+
+<a href="#dendofastestranking">殿堂入り最速ランキング</a></nav>
 
 <div class="search-box">
 <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
@@ -123,8 +123,6 @@ function formatDateYMD(dateStr) {
 
   return "不明";
 }
-
-
   
 async function loadData() {
   document.getElementById("main").innerHTML = "<div class='loading'>データ読み込み中…</div>";
@@ -204,7 +202,7 @@ function render() {
     const today = new Date();
     const todayMMDD = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-    // ===== 🎲 今日の1曲（ランダム・日付固定）=====
+    // =====  今日の1曲（ランダム・日付固定）=====
 　const seed =
   　today.getFullYear() * 10000 +
   　(today.getMonth() + 1) * 100 +
@@ -217,8 +215,6 @@ function render() {
 
 　const randomIndex = Math.floor(seededRandom(seed) * allData.length);
 　const randomSong = allData[randomIndex];
-
-
     const anniversarySongs = allData.filter(song => {
       if (!song.date) return false;
       const dateStr = song.date.toString().trim();
@@ -233,7 +229,7 @@ function render() {
     if (randomSong) {
   html += `
   <div class="today-song">
-    <h2>🎲 今日の1曲</h2>
+    <h2> 今日の1曲</h2>
     <h3><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
     <p>
       投稿者：
@@ -258,7 +254,7 @@ function render() {
 }
 
     html += `<div class="anniversary-section">
-      <h2>🎉 今日の周年曲（${today.getMonth() + 1}月${today.getDate()}日 投稿）</h2>`;
+      <h2> 今日の周年曲（${today.getMonth() + 1}月${today.getDate()}日 投稿）</h2>`;
 
     if (anniversarySongs.length === 0) {
       html += `<p style="text-align:center;color:#888;">今日は周年を迎える殿堂入り曲がありませんでした。</p>`;
@@ -375,11 +371,6 @@ function render() {
     return;
   }
 
-　//殿堂入り最速ランキング
-　if (hash === "dendofastestranking") {
-   
-    
-
   
   // 総合ランキング or 全曲一覧
   if (hash==="ranking") filtered.sort((a,b)=>b.view-a.view);
@@ -429,3 +420,4 @@ window.onload=loadData;
 </script>
 </body>
 </html>
+
