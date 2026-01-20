@@ -205,7 +205,7 @@ function render(){
     if(randomSong){
       html+=`
       <div class="today-song">
-        <h2> 今日の1曲</h2>
+        <h2> 🎲今日の1曲</h2>
         <h3><a href="#song/${randomSong.sm}">${randomSong.title}</a></h3>
         <p>投稿者：<a href="#tag/${encodeURIComponent(randomSong.uploader)}">${randomSong.uploader}</a>　再生数：${randomSong.view.toLocaleString()}回</p>
         <div class="embed-container" style="max-width:800px;margin:1.5rem auto;">
@@ -215,7 +215,7 @@ function render(){
       </div>`;
     }
 
-    html+=`<div class="anniversary-section"><h2> 今日の周年曲（${today.getMonth()+1}月${today.getDate()}日 投稿）</h2>`;
+    html+=`<div class="anniversary-section"><h2> 🎉今日の周年曲（${today.getMonth()+1}月${today.getDate()}日 投稿）</h2>`;
     if(anniversarySongs.length===0){
       html+=`<p style="text-align:center;color:#888;">今日は周年を迎える殿堂入り曲がありませんでした。</p>`;
     }else{
