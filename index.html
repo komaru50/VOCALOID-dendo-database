@@ -4,61 +4,148 @@
 <meta charset="UTF-8">
 <title>ボカロ殿堂入りデータベース</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-body{font-family:'Noto Sans JP',sans-serif;background:#f5fbff;color:#222;margin:0;}
-body.dark{background:#121212;color:#eee;}
-header{background:#00bfff;color:white;padding:2rem;text-align:center;position:relative;}
+
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:#f5fbff;
+  color:#222;
+  margin:0;
+}
+body.dark{
+  background:#121212;
+  color:#eee;
+}
+
+header{
+  background:#00bfff;
+  color:white;
+  padding:2rem;
+  text-align:center;
+  position:relative;
+}
 h1{margin:0;font-size:2.3rem;}
-nav{background:#008fd5;padding:1rem;text-align:center;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;}
-nav a{color:white;padding:.6rem 1rem;border-radius:8px;text-decoration:none;font-weight:bold;}
-nav a.active,nav a:hover{background:#0066aa;}
-.search-box{text-align:center;margin:2rem 0;}
-.search-box input{padding:1rem 1.5rem;font-size:1.2rem;width:500px;max-width:90%;border-radius:50px;border:3px solid #00bfff;}
-table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden;box-shadow:0 8px 30px rgba(0,191,255,.2);}
-th{background:#00bfff;color:white;padding:1.2rem;}
-td{padding:1rem;border-bottom:1px solid #ddd;}
-.loading{text-align:center;padding:4rem;font-size:1.6rem;color:#0066aa;}
-.last-update{position:absolute;top:70px;right:20px;}
-#darkmode{position:absolute;top:20px;left:20px;cursor:pointer;}
+
+#darkmode{
+  position:absolute;
+  top:20px;
+  left:20px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.last-update{
+  position:absolute;
+  top:70px;
+  right:20px;
+  font-size:.9rem;
+}
+
+nav{
+  background:#008fd5;
+  padding:1rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  justify-content:center;
+}
+nav a{
+  color:white;
+  padding:.6rem 1rem;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:bold;
+}
+nav a.active,nav a:hover{
+  background:#0066aa;
+}
+
+.search-box{
+  text-align:center;
+  margin:2rem 0;
+}
+.search-box input{
+  padding:1rem 1.5rem;
+  font-size:1.2rem;
+  width:500px;
+  max-width:90%;
+  border-radius:50px;
+  border:3px solid #00bfff;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,191,255,.2);
+}
+body.dark table{background:#1e1e1e;}
+
+th{
+  background:#00bfff;
+  color:white;
+  padding:1.2rem;
+}
+td{
+  padding:1rem;
+  border-bottom:1px solid #ddd;
+}
+
+.loading{
+  text-align:center;
+  padding:4rem;
+  font-size:1.6rem;
+  color:#0066aa;
+}
 </style>
 </head>
 
 <body>
+
 <header>
-<h1>ボカロ殿堂入りデータベース</h1>
-<div class="last-update" id="last-update">読み込み中…</div>
-<div id="darkmode">Night</div>
+  <h1>ボカロ殿堂入りデータベース</h1>
+  <div id="darkmode">Night</div>
+  <div class="last-update" id="last-update">読み込み中…</div>
 </header>
 
 <nav>
-<a href="#home" class="active">ホーム</a>
-<a href="#ranking">総合ランキング</a>
-<a href="#list">全曲一覧</a>
-<a href="#uploader">P別ランキング</a>
-<a href="#fav">お気に入り</a>
-<a href="#deleted">転載・削除曲</a>
-<a href="#dendofastestranking">殿堂入り最速ランキング</a>
+  <a href="#home" class="active">ホーム</a>
+  <a href="#ranking">総合ランキング</a>
+  <a href="#list">全曲一覧</a>
+  <a href="#uploader">P別ランキング</a>
+  <a href="#fav">お気に入り</a>
+  <a href="#deleted">転載・削除曲</a>
+  <a href="#dendofastestranking">殿堂入り最速ランキング</a>
 </nav>
 
 <div class="search-box">
-<input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
+  <input type="text" id="search" placeholder="曲名・投稿者・タグで検索">
 </div>
 
 <div id="main"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
+/* ===== 設定 ===== */
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
 
+/* ===== データ ===== */
 let allData = [];
 let dendoData = [];
 
+/* ===== 初期ロード ===== */
 async function loadData(){
-  document.getElementById("main").innerHTML="<div class='loading'>読み込み中…</div>";
+  document.getElementById("main").innerHTML =
+    "<div class='loading'>読み込み中…</div>";
+
   try{
     const [mainRes, dendoRes] = await Promise.all([
       fetch(GAS_URL),
-      fetch(GAS_URL+"?type=dendo")
+      fetch(GAS_URL + "?type=dendo")
     ]);
 
     allData = await mainRes.json();
@@ -70,33 +157,76 @@ async function loadData(){
     render();
   }catch(e){
     console.error(e);
-    document.getElementById("main").innerHTML="<div class='loading'>読み込み失敗</div>";
+    document.getElementById("main").innerHTML =
+      "<div class='loading'>読み込み失敗</div>";
   }
 }
 
+/* ===== 画面描画 ===== */
 function render(){
   const hash = location.hash.slice(1) || "home";
 
-  document.querySelectorAll("nav a").forEach(a=>a.classList.remove("active"));
-  document.querySelector(`nav a[href="#${hash}"]`)?.classList.add("active");
+  document.querySelectorAll("nav a")
+    .forEach(a=>a.classList.remove("active"));
+  document.querySelector(`nav a[href="#${hash}"]`)
+    ?.classList.add("active");
+
+  /* --- ホーム --- */
+  if(hash==="home"){
+    document.getElementById("main").innerHTML = `
+      <div style="text-align:center;padding:3rem;">
+        登録曲数：${allData.length} 曲
+      </div>`;
+    return;
+  }
+
+  /* --- 全曲一覧 --- */
+  if(hash==="list"){
+    let html="<table><thead><tr>"+
+      "<th>曲名</th><th>P名</th><th>再生数</th><th>投稿日</th>"+
+      "</tr></thead><tbody>";
+
+    allData.forEach(v=>{
+      html+=`<tr>
+        <td>${v.title}</td>
+        <td>${v.uploader}</td>
+        <td>${v.view}</td>
+        <td>${v.date}</td>
+      </tr>`;
+    });
+
+    html+="</tbody></table>";
+    document.getElementById("main").innerHTML=html;
+    return;
+  }
+
+  /* --- 転載・削除 --- */
+  if(hash==="deleted"){
+    document.getElementById("main").innerHTML =
+      "<div class='loading'>DeletedSongs シート参照</div>";
+    return;
+  }
 
   /* --- 殿堂入り最速ランキング --- */
   if(hash==="dendofastestranking"){
-    const sorted = [...dendoData].sort((a,b)=>
-      a.days.localeCompare(b.days, "ja")
+    const sorted=[...dendoData].sort((a,b)=>
+      a.days.localeCompare(b.days,"ja")
     );
 
-    let html = `<div style="text-align:center;margin:1rem;">
+    let html=`<div style="text-align:center;margin:1rem;">
       殿堂入り最速ランキング 全 ${sorted.length} 曲
     </div>`;
 
-    html += `<table><thead><tr>
-      <th>#</th><th>曲名</th><th>投稿者</th>
-      <th>殿堂入り日</th><th>達成時間</th>
+    html+=`<table><thead><tr>
+      <th>#</th>
+      <th>曲名</th>
+      <th>P名</th>
+      <th>殿堂入り日</th>
+      <th>達成時間</th>
     </tr></thead><tbody>`;
 
     sorted.forEach((v,i)=>{
-      html += `<tr>
+      html+=`<tr>
         <td>${i+1}</td>
         <td>${v.title}</td>
         <td>${v.uploader}</td>
@@ -105,18 +235,23 @@ function render(){
       </tr>`;
     });
 
-    html += "</tbody></table>";
-    document.getElementById("main").innerHTML = html;
+    html+="</tbody></table>";
+    document.getElementById("main").innerHTML=html;
     return;
   }
 
+  /* --- その他 --- */
   document.getElementById("main").innerHTML =
-    "<div class='loading'>※ 他ページは省略（既存通り）</div>";
+    "<div class='loading'>未実装</div>";
 }
 
-document.getElementById("darkmode").onclick=()=>document.body.classList.toggle("dark");
+/* ===== UI ===== */
+document.getElementById("darkmode").onclick=()=>{
+  document.body.classList.toggle("dark");
+};
 window.onhashchange=render;
 window.onload=loadData;
 </script>
+
 </body>
 </html>
