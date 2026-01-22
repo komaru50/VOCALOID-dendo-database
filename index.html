@@ -279,39 +279,7 @@ function render(){
     return;
   }
 
-   /* --- 殿堂入り最速ランキング --- */
-  if(hash==="dendofastestranking"){
-    const sorted = [...dendoData].sort((a,b)=>
-      a.days.localeCompare(b.days, "ja")
-    );
-
-    let html = `<div style="text-align:center;margin:1rem;">
-      殿堂入り最速ランキング 全 ${sorted.length} 曲
-    </div>`;
-
-    html += `<table><thead><tr>
-      <th>#</th><th>曲名</th><th>投稿者</th>
-      <th>殿堂入り日</th><th>達成時間</th>
-    </tr></thead><tbody>`;
-
-    sorted.forEach((v,i)=>{
-      html += `<tr>
-        <td>${i+1}</td>
-        <td>${v.title}</td>
-        <td>${v.uploader}</td>
-        <td>${v.hallDate}</td>
-        <td>${v.days}</td>
-      </tr>`;
-    });
-
-    html += "</tbody></table>";
-    document.getElementById("main").innerHTML = html;
-    return;
-  }
-
-  document.getElementById("main").innerHTML =
-    "<div class='loading'>※ 他ページは省略（既存通り）</div>";
-}
+  
 
   // --- その他のランキング / 全曲一覧 / お気に入り / P別 ---
   let filtered=allData.filter(v=>{
