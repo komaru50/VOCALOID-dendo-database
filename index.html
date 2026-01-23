@@ -169,7 +169,7 @@ function render(){
           <tr><td>投稿日</td><td>${formatDateYMD(song.date)}</td></tr>
           <tr><td>投稿者</td><td>${song.uploader}</td></tr>
           <tr><td>再生数</td><td>${song.view.toLocaleString()} 回</td></tr>
-          <tr><td>マイリスト数</td><td>${(song.mylist ?? 0).toLocaleString()} 件</td></tr>
+          <tr><td>マイリスト数</td><td>${(song.mylist ?? 0).toLocaleString()} </td></tr>
           <tr><td>殿堂入り達成日</td><td>${formattedHallDate}</td></tr>
         </table>
         <div style="margin-top:2rem;">
