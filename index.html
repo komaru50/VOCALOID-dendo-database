@@ -122,10 +122,11 @@ async function loadData(){
     allData=await mainRes.json();
     allData.forEach(song=>{
       song.view=toNumber(song.view);
+      song.mylist=toNumber(song.mylist||0); // ★追加
       song.daily_diff=toNumber(song.daily_diff||0);
       song.weekly_diff=toNumber(song.weekly_diff||0);
-      song.monthly_diff=toNumber(song.monthly_diff||0);
-    });
+      song.monthly_diff=toNumber(song.monthly_diff||0);});
+
 
     if(deletedRes.ok){
       deletedData=await deletedRes.json();
@@ -141,8 +142,9 @@ async function loadData(){
 }
 
 function render(){
-  const hash=location.hash.slice(1)||"home";
-  const songId=hash.startsWith("song/")?hash.slice(5):null;
+  const hash = location.hash.slice(1) || "home";
+  const songId = hash.startsWith("song/") ? hash.slice(5) : null;
+  const tagName = hash.startsWith("tag/") ? decodeURIComponent(hash.slice(4)) : null;
 
   document.querySelectorAll("nav a").forEach(a=>a.classList.remove("active"));
   if(songId) document.querySelector(`nav a[href="#ranking"]`).classList.add("active");
@@ -167,8 +169,8 @@ function render(){
           <tr><td>投稿日</td><td>${formatDateYMD(song.date)}</td></tr>
           <tr><td>投稿者</td><td>${song.uploader}</td></tr>
           <tr><td>再生数</td><td>${song.view.toLocaleString()} 回</td></tr>
+          <tr><td>マイリスト数</td><td>${(song.mylist ?? 0).toLocaleString()} 件</td></tr>
           <tr><td>殿堂入り達成日</td><td>${formattedHallDate}</td></tr>
-          <tr><td>達成時間</td><td>${song.days||"未設定"}</td></tr>
         </table>
         <div style="margin-top:2rem;">
           ${(song.tags||[]).map(t=>`<span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>`).join(" ")}
@@ -238,7 +240,73 @@ function render(){
     document.getElementById("pagination").innerHTML="";
     return;
   }
+ 
+// --- タグ別ページ ---
+if(tagName){
+  currentTag = tagName;
+  document.title = `${tagName} - タグ別表示 | ボカロ殿堂入りDB`;
 
+  let filtered = allData.filter(v =>
+    v.uploader === tagName ||
+    (v.tags || []).includes(tagName)
+  );
+
+  if(filtered.length === 0){
+    document.getElementById("main").innerHTML =
+      `<div class="loading">「${tagName}」の曲が見つかりませんでした</div>`;
+    document.getElementById("pagination").innerHTML = "";
+    return;
+  }
+
+  filtered.sort((a,b)=>b.view-a.view);
+
+  const total = filtered.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  currentPage = Math.min(currentPage, pages || 1);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filtered.slice(start, start + PAGE_SIZE);
+
+  let html = `
+    <h2 style="text-align:center;color:#00bfff;margin:2rem;">
+      🏷 タグ：${tagName}
+    </h2>
+    <div style="text-align:center;margin:1rem;color:#555;">
+      ${total} 曲
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>タグ</th></tr>
+      </thead>
+      <tbody>
+  `;
+
+  pageData.forEach((v,i)=>{
+    const rank = start + i + 1;
+    html += `
+      <tr>
+        <td style="text-align:center;font-weight:bold;color:#00bfff;">${rank}</td>
+        <td><a href="#song/${v.sm}">${v.title}</a></td>
+        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+        <td style="text-align:right;">${v.view.toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`
+          <span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>
+        `).join(" ")}</td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById("main").innerHTML = html;
+
+  let pagi = "";
+  for(let i=1;i<=pages;i++){
+    pagi += `<button ${i===currentPage?"class='active'":""}
+      onclick="currentPage=${i};render()">${i}</button>`;
+  }
+  document.getElementById("pagination").innerHTML = pagi;
+  return;
+}
+ 
   // --- 削除曲 ---
   if(hash==="deleted"){
     if(deletedData.length===0){
