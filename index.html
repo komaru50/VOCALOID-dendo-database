@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ボカロ殿堂入りデータベース</title>
+<title>VOCALOID殿堂入りデータベース</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -53,7 +53,7 @@ body.dark .today-song{background:#1e1e1e;}
 <body>
 
 <header>
-<h1>ボカロ殿堂入りデータベース</h1>
+<h1>VOCALOID殿堂入りデータベース</h1>
 <div class="last-update" id="last-update">読み込み中…</div>
 <div id="darkmode">Night</div>
 </header>
@@ -76,7 +76,7 @@ body.dark .today-song{background:#1e1e1e;}
 <div class="pagination" id="pagination"></div>
 
 <script>
-const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbzmy850fQI4QsOxV2XNuBKNB9H9-SZ_16MmcOISGTPtPYEGiRbAycp3WJ_uNg372H95/exec";
+const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
 const PAGE_SIZE = 30;
 
