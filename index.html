@@ -74,20 +74,7 @@ body.dark .today-song{background:#1e1e1e;}
 
 <div class="container" id="main"></div>
 <div class="pagination" id="pagination"></div>
-
-<div class="pagination">
-  <button class="page-btn">最初</button>
-  <button class="page-btn">前ページ</button>
-
-  <div class="page-current">
-    <span>26</span>
-    <button class="page-arrow">▶</button>
-  </div>
-
-  <button class="page-btn">次ページ</button>
-  <button class="page-btn">最後</button>
-</div>
-
+ 
 
 <script>
 const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
@@ -312,12 +299,8 @@ if(tagName){
   html += `</tbody></table>`;
   document.getElementById("main").innerHTML = html;
 
-  let pagi = "";
-  for(let i=1;i<=pages;i++){
-    pagi += `<button ${i===currentPage?"class='active'":""}
-      onclick="currentPage=${i};render()">${i}</button>`;
-  }
-  document.getElementById("pagination").innerHTML = pagi;
+document.getElementById("pagination").innerHTML =
+  formatPagination(currentPage, pages);
   return;
 }
  
@@ -454,6 +437,38 @@ function formatPagination(currentPage, totalPages) {
       <button onclick="goPage(${currentPage + 1})" ${isLast ? "disabled" : ""}>次ページ</button>
       <button onclick="goPage(${totalPages})" ${isLast ? "disabled" : ""}>最後</button>
     </div>
+  `;
+}
+
+function goPage(page){
+  if(page < 1) return;
+  currentPage = page;
+  render();
+}
+
+function goPage(page){
+  if(page < 1) return;
+  currentPage = page;
+  render();
+}
+
+function formatPagination(currentPage, totalPages) {
+  if (!totalPages || totalPages <= 1) return "";
+
+  const isFirst = currentPage <= 1;
+  const isLast  = currentPage >= totalPages;
+
+  return `
+    <button onclick="goPage(1)" ${isFirst?"disabled":""}>最初</button>
+    <button onclick="goPage(${currentPage-1})" ${isFirst?"disabled":""}>前ページ</button>
+
+    <span style="margin:0 1rem;font-weight:bold;">
+      ${currentPage}
+      <button onclick="goPage(${currentPage+1})" ${isLast?"disabled":""}>▶</button>
+    </span>
+
+    <button onclick="goPage(${currentPage+1})" ${isLast?"disabled":""}>次ページ</button>
+    <button onclick="goPage(${totalPages})" ${isLast?"disabled":""}>最後</button>
   `;
 }
 
