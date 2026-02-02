@@ -75,6 +75,20 @@ body.dark .today-song{background:#1e1e1e;}
 <div class="container" id="main"></div>
 <div class="pagination" id="pagination"></div>
 
+<div class="pagination">
+  <button class="page-btn">最初</button>
+  <button class="page-btn">前ページ</button>
+
+  <div class="page-current">
+    <span>26</span>
+    <button class="page-arrow">▶</button>
+  </div>
+
+  <button class="page-btn">次ページ</button>
+  <button class="page-btn">最後</button>
+</div>
+
+
 <script>
 const SPREADSHEET_JSON_URL = "https://script.google.com/macros/s/AKfycbwGPuL7BrUXhULBw8Qy_c8tRxF1BZ14gJX-ZnfTRWVr2ptE87T_U6njO9_PcIqWByXO/exec";
 let allData = [], deletedData = [], currentTag = "", currentPage = 1;
@@ -421,6 +435,29 @@ function toggleFav(sm){
   render();
 }
 
+function formatPagination(currentPage, totalPages) {
+  if (!totalPages || totalPages <= 1) return "";
+
+  const isFirst = currentPage <= 1;
+  const isLast  = currentPage >= totalPages;
+
+  return `
+    <div class="pagination">
+      <button onclick="goPage(1)" ${isFirst ? "disabled" : ""}>最初</button>
+      <button onclick="goPage(${currentPage - 1})" ${isFirst ? "disabled" : ""}>前ページ</button>
+
+      <span class="page-current">
+        ${currentPage}
+        <button onclick="goPage(${currentPage + 1})" ${isLast ? "disabled" : ""}>▶</button>
+      </span>
+
+      <button onclick="goPage(${currentPage + 1})" ${isLast ? "disabled" : ""}>次ページ</button>
+      <button onclick="goPage(${totalPages})" ${isLast ? "disabled" : ""}>最後</button>
+    </div>
+  `;
+}
+
+  
 document.getElementById("darkmode").onclick=()=>document.body.classList.toggle("dark");
 document.getElementById("search").oninput=()=>{currentPage=1;render();};
 window.onhashchange=()=>{currentPage=1;render();};
