@@ -48,6 +48,41 @@ body.dark .today-song{background:#1e1e1e;}
 .today-song h3{font-size:1.8rem;margin:1rem 0;text-align:left;}
 .today-song p{margin:0.5rem 0;text-align:left;}
 .anniversary-section h2{font-size:1.8rem;color:#00bfff;margin-bottom:1.5rem;text-align:left;}
+.gacha-box{
+  max-width:900px;
+  margin:3rem auto;
+  background:white;
+  padding:2.5rem;
+  border-radius:20px;
+  box-shadow:0 12px 30px rgba(0,191,255,.25);
+}
+body.dark .gacha-box{background:#1e1e1e;}
+.gacha-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+  justify-content:center;
+  margin-bottom:2rem;
+}
+.gacha-controls input{
+  padding:.7rem 1rem;
+  border-radius:10px;
+  border:2px solid #00bfff;
+  font-size:1rem;
+}
+.gacha-controls button{
+  padding:.7rem 1.5rem;
+  border-radius:12px;
+  border:none;
+  background:#00bfff;
+  color:white;
+  font-size:1.1rem;
+  font-weight:bold;
+  cursor:pointer;
+}
+.gacha-controls button:hover{background:#008fd5;}
+.gacha-result table{margin-top:1.5rem;}
+
 </style>
 </head>
 <body>
@@ -66,6 +101,7 @@ body.dark .today-song{background:#1e1e1e;}
 <a href="#fav">お気に入り</a>
 <a href="#deleted">転載・削除曲</a>
 <a href="#dendofastestranking">殿堂入り最速ランキング</a>
+<a href="#gacha">ガチャ</a>
 </nav>
 
 <div class="search-box">
@@ -343,6 +379,29 @@ document.getElementById("pagination").innerHTML =
     document.title="転載・削除曲 - ボカロ殿堂入りDB";
     return;
   }
+ 　// --- ガチャ ---
+if(hash==="gacha"){
+  document.title="ガチャ - ボカロ殿堂入りDB";
+
+  document.getElementById("main").innerHTML=`
+    <div class="gacha-box">
+      <h2 style="text-align:center;color:#00bfff;margin-bottom:2rem;">🎰 ボカロ殿堂入りガチャ</h2>
+
+      <div class="gacha-controls">
+        <input id="gacha-count" type="number" min="1" max="50" value="10" placeholder="排出曲数">
+        <input id="gacha-min" type="number" value="0" placeholder="最小再生数">
+        <input id="gacha-max" type="number" value="1000000000" placeholder="最大再生数">
+        <input id="gacha-tag" type="text" placeholder="指定タグ（任意）">
+        <button onclick="drawGacha()">ガチャを引く！</button>
+      </div>
+
+      <div id="gacha-result" class="gacha-result"></div>
+    </div>
+  `;
+  document.getElementById("pagination").innerHTML="";
+  return;
+}
+
 
   
 
@@ -477,6 +536,68 @@ document.getElementById("darkmode").onclick=()=>document.body.classList.toggle("
 document.getElementById("search").oninput=()=>{currentPage=1;render();};
 window.onhashchange=()=>{currentPage=1;render();};
 window.onload=loadData;
+
+function drawGacha(){
+  const count = Math.min(50, Math.max(1, Number(document.getElementById("gacha-count").value)||10));
+  const minView = Number(document.getElementById("gacha-min").value)||0;
+  const maxView = Number(document.getElementById("gacha-max").value)||1e12;
+  const tag = document.getElementById("gacha-tag").value.trim();
+
+  let pool = allData.filter(v =>
+    v.view >= minView &&
+    v.view <= maxView &&
+    (
+      !tag ||
+      v.uploader === tag ||
+      (v.tags||[]).includes(tag)
+    )
+  );
+
+  if(pool.length === 0){
+    document.getElementById("gacha-result").innerHTML =
+      `<div class="loading">条件に合う曲がありません…</div>`;
+    return;
+  }
+
+  // シャッフル
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+
+  const result = pool.slice(0, Math.min(count, pool.length));
+
+  let html = `
+    <div style="text-align:center;margin-bottom:1rem;color:#555;">
+      抽選結果：${result.length} 曲（候補 ${pool.length} 曲）
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>曲名</th><th>投稿者</th><th>再生数</th><th>タグ</th></tr>
+      </thead>
+      <tbody>
+  `;
+
+  result.forEach((v,i)=>{
+    html+=`
+      <tr>
+        <td style="text-align:center;font-weight:bold;color:#00bfff;">${i+1}</td>
+        <td><a href="#song/${v.sm}">${v.title}</a></td>
+        <td><a href="#tag/${encodeURIComponent(v.uploader)}">${v.uploader}</a></td>
+        <td style="text-align:right;">${v.view.toLocaleString()}</td>
+        <td>${(v.tags||[]).map(t=>`
+          <span class="tag" onclick="location.hash='#tag/${encodeURIComponent(t)}'">${t}</span>
+        `).join(" ")}</td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table>";
+
+  document.getElementById("gacha-result").innerHTML = html;
+}
+
+
 </script>
 
 </body>
